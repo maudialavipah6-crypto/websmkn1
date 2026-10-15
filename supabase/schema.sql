@@ -23,11 +23,14 @@ create policy "Publik dapat melihat departments"
   using (true);
 
 insert into public.departments (name, short_name, description, accent)
-values (
+select
   'Teknik Komputer dan Jaringan',
   'TKJ',
   'Membangun keterampilan komputer, jaringan, dan infrastruktur digital.',
   'navy'
+where not exists (
+  select 1 from public.departments where short_name = 'TKJ'
+)
 )
 on conflict do nothing;
 

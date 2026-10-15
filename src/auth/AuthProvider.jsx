@@ -57,13 +57,13 @@ export function AuthProvider({ children }) {
 
   const signInDemo = useCallback(async (email, password) => {
     if (!demoModeAvailable || isSupabaseConfigured) {
-      throw new Error('Akun demo hanya tersedia saat Supabase belum dikonfigurasi pada mode pengembangan.');
+      throw new Error('Akun sekolah hanya tersedia saat Supabase belum dikonfigurasi pada mode pengembangan.');
     }
 
-    const { findDemoUser, persistDemoUser } = await import('./demoUsers');
+    const { findDemoUser, persistDemoUser } = await import('./schoolAccounts');
     const user = findDemoUser(email, password);
     if (!user) {
-      throw new Error('Email atau kata sandi akun demo tidak cocok. Periksa akun pratinjau lokal.');
+      throw new Error('Email atau kata sandi akun sekolah tidak cocok. Periksa daftar akun lokal yang tersedia.');
     }
 
     persistDemoUser(user);
@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
   const signOut = useCallback(async () => {
     if (demoUser) {
       try {
-        const { clearDemoUser } = await import('./demoUsers');
+        const { clearDemoUser } = await import('./schoolAccounts');
         clearDemoUser();
         setDemoUser(null);
         setSession(null);
@@ -101,7 +101,7 @@ export function AuthProvider({ children }) {
       async function restoreLocalDemoSession() {
         if (demoModeAvailable) {
           try {
-            const { restoreDemoUser } = await import('./demoUsers');
+            const { restoreDemoUser } = await import('./schoolAccounts');
             const restoredUser = restoreDemoUser();
             if (mounted && restoredUser) {
               setDemoUser(restoredUser);

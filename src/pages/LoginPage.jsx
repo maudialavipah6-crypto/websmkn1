@@ -40,7 +40,7 @@ function LoginPage() {
     if (!demoModeAvailable) return undefined;
 
     let mounted = true;
-    import('../auth/demoUsers')
+    import('../auth/schoolAccounts')
       .then(({ demoUsers: accounts }) => {
         if (mounted) setDemoUsers(accounts);
       })
@@ -190,7 +190,7 @@ function LoginPage() {
           )}
           {demoMode && !recoveryMode && (
             <div className="form-alert is-info" role="status">
-              Anda sedang melihat akun demo. Data contoh ini bukan akun atau catatan sekolah yang sebenarnya.
+              Anda sedang masuk dengan daftar akun sekolah lokal untuk pengujian awal.
               <a href="#/dashboard">Buka dashboard <ArrowRight size={14} /></a>
             </div>
           )}
@@ -236,12 +236,12 @@ function LoginPage() {
           {demoModeAvailable && mode === 'signin' && !recoveryMode && (
             <section className="demo-account-list" aria-labelledby="demo-account-heading">
               <div className="demo-account-heading">
-                <strong id="demo-account-heading">Akun pratinjau lokal</strong>
-                <span>Akun ini hanya untuk mencoba tampilan, bukan akun sekolah yang sebenarnya.</span>
+                <strong id="demo-account-heading">Akun sekolah siap dipakai</strong>
+                <span>Daftar ini sesuai roster guru dan siswa SMKN 1 Garut untuk pengujian awal.</span>
               </div>
               {demoUsers.length === 0 && (
                 <p className="demo-account-empty" role="status">
-                  Atur akun contoh fiktif di file <code>.env.local</code> untuk pratinjau.
+                  Daftar akun sekolah belum tersedia. Periksa file <code>src/auth/schoolAccounts.js</code>.
                 </p>
               )}
               {demoUsers.map((user) => (
