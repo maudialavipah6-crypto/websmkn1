@@ -31,7 +31,6 @@ select
 where not exists (
   select 1 from public.departments where short_name = 'TKJ'
 )
-)
 on conflict do nothing;
 
 create table if not exists public.profiles (

@@ -2,20 +2,15 @@
 
 Portal memakai Supabase Auth, database, dan Supabase Storage untuk akun siswa/guru, materi TKJ, lampiran privat, kuis, hasil kuis, dan presensi. Supabase belum terhubung sampai langkah berikut dilakukan untuk proyek milik sekolah.
 
-## Mencoba akun dummy sebelum Supabase siap
+## Pratinjau lokal sebelum Supabase siap
 
-Jalankan situs dengan `npm run dev`. Simpan akun pratinjau di `.env.local` (salin `.env.example`, lalu sesuaikan bila diperlukan):
+Jalankan situs dengan `npm run dev`. Saat Supabase belum dikonfigurasi, development mode menampilkan roster lokal dari `src/auth/schoolAccounts.js` untuk pratinjau dashboard. Kata sandi `local-preview-only` hanya untuk simulasi lokal, bukan kata sandi akun Auth sekolah.
 
-| Variabel | Nilai awal |
-|---|---|---|
-| `VITE_DEMO_TEACHER_EMAIL` | `guru@tkj.demo` |
-| `VITE_DEMO_TEACHER_PASSWORD` | Atur kata sandi lokal |
-| `VITE_DEMO_STUDENT_EMAIL` | `siswa@tkj.demo` |
-| `VITE_DEMO_STUDENT_PASSWORD` | Atur kata sandi lokal |
+Tidak diperlukan variabel demo di `.env.local`.
 
-Gunakan hanya kredensial fiktif: variabel `VITE_*` dipublikasikan ke browser dan bukan tempat menyimpan rahasia akun nyata. Akun demo aktif hanya di server pengembangan saat Supabase belum dikonfigurasi. Profil, materi, hasil kuis, dan presensi yang ditampilkan adalah contoh, bukan baris `auth.users` atau database Supabase; dashboard pratinjau hanya-baca. Sesi demo hanya disimpan pada sesi browser. Setelah Supabase dikonfigurasi, login kembali dengan akun Auth yang benar; akun dummy tidak dibuat atau disalin ke database.
+Materi, kuis, hasil, dan presensi pada mode ini bersifat pratinjau dan tidak tersimpan di Supabase. Jangan gunakan mode lokal untuk data sekolah nyata.
 
-Saat membuat build produksi dengan `npm run build`, modul kredensial demo diganti dengan modul kosong dan tidak disertakan dalam bundle.
+Build produksi mengganti modul roster lokal dengan modul kosong; nama/email roster dan password pratinjau tidak dimasukkan ke bundle.
 
 ## 1. Terapkan skema database
 
@@ -37,11 +32,11 @@ Jalankan ulang skrip skema yang telah diperbarui pada proyek yang sebelumnya sud
 
 - Siswa hanya melihat materi dan kuis terbit. Materi dapat dibuka dengan gambar tersemat serta tautan unduh PDF/gambar.
 - Siswa dapat mengerjakan kuis yang tersedia dan menerima nilai hasil penilaian database, serta menandai kehadiran pada sesi presensi terbuka.
-- Data belajar nyata memerlukan akun Supabase Auth yang terdaftar. Akun demo lokal tetap hanya-baca dan tidak menyimpan materi, kuis, hasil, presensi, atau lampiran.
+- Data belajar nyata memerlukan akun Supabase Auth yang terdaftar. Mode pratinjau lokal hanya-baca dan tidak menyimpan materi, kuis, hasil, presensi, atau lampiran.
 
 ## 2. Konfigurasikan variabel lokal
 
-Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan **publishable key** dari pengaturan API proyek. Pertahankan variabel akun demo hanya jika diperlukan untuk pratinjau lokal:
+Salin `.env.example` menjadi `.env.local`, lalu isi URL proyek dan **publishable key** dari pengaturan API proyek:
 
 ```dotenv
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -61,7 +56,7 @@ Ganti contoh URL produksi dengan domain yang benar. Aktifkan konfirmasi email un
 
 ## 4. Provision akun guru dan siswa
 
-Daftar nama dan email berada di `src/auth/schoolAccounts.js`, yang sengaja tidak diunggah ke GitHub. Jalankan provisioning hanya dari komputer admin setelah schema berhasil diterapkan. Script membuat kata sandi acak untuk akun baru dan menetapkan profil/role yang sesuai. Akun yang sudah ada tidak akan di-reset; kata sandinya tidak dapat dibaca kembali dan akan ditandai demikian di file hasil.
+Daftar nama dan email berada di `src/auth/schoolAccounts.js`, yang sengaja tidak diunggah ke GitHub. Jalankan provisioning hanya dari komputer admin setelah schema berhasil diterapkan. Script membuat kata sandi acak untuk akun baru dan mengatur ulang password akun roster yang sudah ada agar seluruh kredensial tercatat. Profil/role akan disesuaikan dengan roster.
 
 Di PowerShell, masukkan URL proyek dan service-role key secara lokal. Jangan tempelkan service-role key ke chat, browser, `.env.example`, atau variabel `VITE_*`:
 
@@ -74,7 +69,9 @@ Remove-Item Env:SUPABASE_SERVICE_ROLE_KEY
 Remove-Item Env:SUPABASE_URL
 ```
 
-Script memerlukan `public.profiles` dan trigger dari schema di atas. Kredensial hasil dibuat di `supabase/school-account-credentials.json`; file tersebut diabaikan Git dan hanya berisi password yang baru dibuat. Simpan dan bagikan file itu melalui kanal privat sekolah, lalu minta pengguna mengganti password melalui alur pemulihan akun. Untuk akun yang sudah ada, admin perlu mengatur atau memulihkan password lewat Supabase Auth.
+Script memerlukan `public.profiles` dan trigger dari schema di atas. Kredensial hasil dibuat di `supabase/school-account-credentials.json`; file tersebut diabaikan Git dan berisi password acak akun baru maupun akun roster yang diatur ulang. Simpan file itu secara aman dan bagikan melalui kanal privat sekolah, lalu minta pengguna mengganti password melalui alur pemulihan akun.
+
+Pastikan domain email roster merupakan domain yang disetujui sekolah. Akun dibuat dengan email terkonfirmasi tanpa mengirim email; jika alamat itu bukan mailbox yang bisa menerima email, pemulihan password otomatis melalui email tidak akan tersedia.
 
 Setelah provisioning, periksa daftar user pada **Authentication → Users** dan pastikan profil guru memiliki role `teacher`. Jangan pernah memberikan service-role key kepada guru atau siswa.
 

@@ -10,8 +10,8 @@ export default defineConfig({
   resolve: {
     alias: process.env.NODE_ENV === 'production'
       ? [{
-          find: /^(?:\.{1,2}\/)(?:auth\/)?demoUsers$/,
-          replacement: resolve(projectRoot, 'src/auth/demoUsers.production.js'),
+          find: /^(?:\.{1,2}\/)(?:auth\/)?(?:demoUsers|schoolAccounts)$/,
+          replacement: resolve(projectRoot, 'src/auth/schoolAccounts.production.js'),
         }]
       : [],
   },

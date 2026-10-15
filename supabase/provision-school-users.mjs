@@ -99,20 +99,35 @@ const authUsersByEmail = new Map(
 const savedCredentials = await readExistingCredentials();
 let createdCount = 0;
 let existingCount = 0;
+let resetCount = 0;
 
 for (const account of emailAccounts) {
   let authUser = authUsersByEmail.get(account.email);
   let saved = savedCredentials.get(account.email);
 
   if (!authUser) {
-    const password = `A9!a${randomBytes(24).toString('base64url')}`;
+    if (!saved || !saved.password || saved.status !== 'pending') {
+      saved = {
+        email: account.email,
+        display_name: account.display_name,
+        role: account.role,
+        password: `A9!a${randomBytes(24).toString('base64url')}`,
+        status: 'pending',
+      };
+      savedCredentials.set(account.email, saved);
+    }
+
+    await saveCredentials(savedCredentials);
+
     const { data, error } = await supabase.auth.admin.createUser({
       email: account.email,
-      password,
+      password: saved.password,
       email_confirm: true,
       user_metadata: { display_name: account.display_name },
     });
     if (error) {
+      savedCredentials.set(account.email, { ...saved, status: 'failed' });
+      await saveCredentials(savedCredentials);
       throw new Error(`Gagal membuat akun ${account.email}: ${error.message}`);
     }
     if (!data.user) {
@@ -121,13 +136,7 @@ for (const account of emailAccounts) {
 
     authUser = data.user;
     authUsersByEmail.set(account.email, authUser);
-    saved = {
-      email: account.email,
-      display_name: account.display_name,
-      role: account.role,
-      password,
-      status: 'created',
-    };
+    saved = { ...saved, status: 'created' };
     savedCredentials.set(account.email, saved);
     await saveCredentials(savedCredentials);
     createdCount += 1;
@@ -139,6 +148,49 @@ for (const account of emailAccounts) {
       password: null,
       status: 'already-existed',
     };
+
+    if (saved.password && ['created', 'password-reset'].includes(saved.status)) {
+      saved = {
+        ...saved,
+        display_name: account.display_name,
+        role: account.role,
+      };
+    } else if (saved.password && saved.status === 'pending') {
+      saved = {
+        ...saved,
+        display_name: account.display_name,
+        role: account.role,
+        status: 'created',
+      };
+    } else {
+      if (!saved.password || saved.status !== 'pending-reset') {
+        saved = {
+          email: account.email,
+          display_name: account.display_name,
+          role: account.role,
+          password: `A9!a${randomBytes(24).toString('base64url')}`,
+          status: 'pending-reset',
+        };
+      }
+      savedCredentials.set(account.email, saved);
+      await saveCredentials(savedCredentials);
+
+      const { error } = await supabase.auth.admin.updateUserById(
+        authUser.id,
+        { password: saved.password },
+      );
+      if (error) {
+        savedCredentials.set(account.email, { ...saved, status: 'failed' });
+        await saveCredentials(savedCredentials);
+        throw new Error(`Gagal memperbarui kata sandi ${account.email}: ${error.message}`);
+      }
+
+      saved = { ...saved, status: 'password-reset' };
+      savedCredentials.set(account.email, saved);
+      await saveCredentials(savedCredentials);
+      resetCount += 1;
+    }
+
     savedCredentials.set(account.email, {
       ...saved,
       display_name: account.display_name,
@@ -167,5 +219,5 @@ for (const account of emailAccounts) {
 }
 
 console.log(
-  `Selesai. ${createdCount} akun dibuat, ${existingCount} akun sudah ada. Kredensial lokal: ${credentialsPath}`,
+  `Selesai. ${createdCount} akun dibuat, ${resetCount} kata sandi akun lama diatur ulang, ${existingCount} akun sudah ada. Kredensial lokal: ${credentialsPath}`,
 );
