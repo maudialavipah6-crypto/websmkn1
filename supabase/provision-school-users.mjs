@@ -106,7 +106,7 @@ for (const account of emailAccounts) {
   let saved = savedCredentials.get(account.email);
 
   if (!authUser) {
-    if (!saved || !saved.password || saved.status !== 'pending') {
+    if (!saved || !saved.password || !['pending', 'pending-dashboard'].includes(saved.status)) {
       saved = {
         email: account.email,
         display_name: account.display_name,
@@ -114,6 +114,9 @@ for (const account of emailAccounts) {
         password: `A9!a${randomBytes(24).toString('base64url')}`,
         status: 'pending',
       };
+      savedCredentials.set(account.email, saved);
+    } else {
+      saved = { ...saved, status: 'pending' };
       savedCredentials.set(account.email, saved);
     }
 
@@ -163,7 +166,7 @@ for (const account of emailAccounts) {
         status: 'created',
       };
     } else {
-      if (!saved.password || saved.status !== 'pending-reset') {
+      if (!saved.password || !['pending-reset', 'pending-dashboard'].includes(saved.status)) {
         saved = {
           email: account.email,
           display_name: account.display_name,
@@ -171,6 +174,8 @@ for (const account of emailAccounts) {
           password: `A9!a${randomBytes(24).toString('base64url')}`,
           status: 'pending-reset',
         };
+      } else {
+        saved = { ...saved, status: 'pending-reset' };
       }
       savedCredentials.set(account.email, saved);
       await saveCredentials(savedCredentials);
