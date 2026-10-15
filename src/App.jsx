@@ -1,0 +1,312 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BookOpen,
+  Cable,
+  ChevronRight,
+  Cpu,
+  Laptop,
+  MapPin,
+  Mail,
+  Menu,
+  Phone,
+  Router,
+  Server,
+  Wifi,
+  X,
+} from 'lucide-react';
+import { useAuth } from './auth/AuthProvider';
+
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+
+const topics = [
+  {
+    id: 'perangkat',
+    title: 'Komputer dan perangkat',
+    description: 'Mengenali komponen, merakit, merawat, dan mendiagnosis perangkat komputer.',
+    icon: Cpu,
+  },
+  {
+    id: 'jaringan',
+    title: 'Jaringan dan konektivitas',
+    description: 'Memahami topologi, media transmisi, pengalamatan, dan konfigurasi jaringan.',
+    icon: Cable,
+  },
+  {
+    id: 'server',
+    title: 'Server dan layanan jaringan',
+    description: 'Mengenal peran server, layanan jaringan, dan dasar pengamanan infrastruktur.',
+    icon: Server,
+  },
+];
+
+const navigation = [
+  ['#beranda', 'Beranda'],
+  ['#program-tkj', 'Program TKJ'],
+  ['#pembelajaran', 'Pembelajaran'],
+  ['#visi-misi', 'Visi & Misi'],
+  ['#kontak', 'Kontak'],
+];
+
+function currentRoute() {
+  const hash = window.location.hash;
+  if (!hash.startsWith('#/')) return 'home';
+  return hash.slice(2).split('?')[0] || 'home';
+}
+
+function App() {
+  const { session, profile, loading: authLoading, isPasswordRecovery } = useAuth();
+  const [route, setRoute] = useState(currentRoute);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const updateRoute = () => {
+      setRoute(currentRoute());
+      setMenuOpen(false);
+    };
+    window.addEventListener('hashchange', updateRoute);
+    return () => window.removeEventListener('hashchange', updateRoute);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('has-dashboard', route === 'dashboard');
+    return () => document.body.classList.remove('has-dashboard');
+  }, [route]);
+
+  if (route === 'login' || isPasswordRecovery) {
+    return (
+      <Suspense fallback={<div className="route-loading" role="status">Memuat halaman login…</div>}>
+        <LoginPage />
+      </Suspense>
+    );
+  }
+
+  if (route === 'dashboard') {
+    if (authLoading) {
+      return <div className="route-loading" role="status">Memeriksa sesi akun…</div>;
+    }
+    if (!session || !profile) {
+      return <LoginPage />;
+    }
+    return (
+      <Suspense fallback={<div className="route-loading" role="status">Memuat dashboard…</div>}>
+        <DashboardPage />
+      </Suspense>
+    );
+  }
+
+  const loggedIn = Boolean(session && profile);
+  const accountHref = loggedIn ? '#/dashboard' : '#/login';
+  const accountLabel = loggedIn ? 'Dashboard' : 'Login guru / siswa';
+  const mapQuery = encodeURIComponent(
+    'Jl. Cimanuk No. 309A, Pataruman, Tarogong Kidul, Kabupaten Garut, Jawa Barat',
+  );
+
+  return (
+    <div className="page-shell">
+      <header className="topbar">
+        <a className="brand-wrap" href="#beranda" aria-label="SMKN 1 Garut, kembali ke beranda">
+          <img className="brand-logo" src="/LOGO_SMKN1_GARUT.jpeg" alt="Logo SMKN 1 Garut" />
+          <span className="brand-copy">
+            <strong>SMKN 1 Garut</strong>
+            <span>Teknik Komputer dan Jaringan</span>
+          </span>
+        </a>
+
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-label={menuOpen ? 'Tutup navigasi' : 'Buka navigasi'}
+          aria-expanded={menuOpen}
+          aria-controls="main-navigation"
+          onClick={() => setMenuOpen((isOpen) => !isOpen)}
+        >
+          {menuOpen ? <X size={21} /> : <Menu size={21} />}
+        </button>
+
+        <nav className={`nav${menuOpen ? ' is-open' : ''}`} id="main-navigation" aria-label="Navigasi utama">
+          {navigation.map(([href, label]) => (
+            <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
+          ))}
+        </nav>
+
+        <a className="header-cta" href={accountHref}>
+          {accountLabel}
+          <ArrowUpRight size={16} aria-hidden="true" />
+        </a>
+      </header>
+
+      <main>
+        <section className="hero" id="beranda">
+          <motion.div
+            className="hero-copy"
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <h1>Merancang koneksi. Membuka kemungkinan.</h1>
+            <p className="hero-description">
+              Kenali Teknik Komputer dan Jaringan SMKN 1 Garut—belajar komputer, membangun
+              jaringan, dan memahami infrastruktur digital lewat praktik.
+            </p>
+            <div className="hero-actions">
+              <a className="button button-bright" href="#program-tkj">
+                Jelajahi program TKJ
+                <ArrowRight size={18} aria-hidden="true" />
+              </a>
+              <a className="button button-quiet" href={accountHref}>
+                {loggedIn ? 'Buka dashboard' : 'Login guru dan siswa'}
+              </a>
+            </div>
+            <div className="hero-tags" aria-label="Bidang pembelajaran TKJ">
+              <span>Komputer</span>
+              <span>Jaringan</span>
+              <span>Server</span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="topology-panel"
+            role="img"
+            aria-label="Diagram topologi jaringan TKJ"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="panel-heading">
+              <span className="panel-dot" />
+              <span>Topologi jaringan</span>
+              <span className="panel-code">LAN / STAR</span>
+            </div>
+            <div className="topology-map">
+              <svg className="topology-lines" viewBox="0 0 480 340" aria-hidden="true">
+                <path d="M240 171 112 80M240 171 368 80M240 171 112 262M240 171 368 262" />
+                <path className="line-active" d="M112 80 240 171 368 262" />
+                <circle cx="240" cy="171" r="4" />
+                <circle cx="112" cy="80" r="3" />
+                <circle cx="368" cy="80" r="3" />
+                <circle cx="112" cy="262" r="3" />
+                <circle cx="368" cy="262" r="3" />
+              </svg>
+              <div className="topology-node node-router"><Router size={23} /><span>Router</span></div>
+              <div className="topology-node node-server"><Server size={21} /><span>Server</span></div>
+              <div className="topology-node node-client node-client-left"><Laptop size={20} /><span>Client</span></div>
+              <div className="topology-node node-client node-client-right"><Laptop size={20} /><span>Client</span></div>
+              <div className="topology-node node-wifi"><Wifi size={20} /><span>Wi-Fi</span></div>
+            </div>
+            <div className="panel-legend">
+              <span><i className="legend-line" /> Perangkat</span>
+              <span><i className="legend-node" /> Koneksi</span>
+              <a href="#program-tkj">Jelajahi <ChevronRight size={14} /></a>
+            </div>
+          </motion.div>
+          <span className="hero-coordinate" aria-hidden="true">PETA TOPOLOGI · TKJ</span>
+        </section>
+
+        <section className="section program-section" id="program-tkj">
+          <div className="section-heading">
+            <div><h2>Belajar memahami cara perangkat saling terhubung.</h2></div>
+            <p className="section-intro">
+              Teknik Komputer dan Jaringan memadukan pemahaman perangkat dengan keterampilan
+              merancang, mengonfigurasi, dan merawat jaringan.
+            </p>
+          </div>
+          <div className="topic-list">
+            {topics.map(({ id, title, description, icon: Icon }, index) => (
+              <article className="topic-row" key={id}>
+                <span className="topic-number">0{index + 1}</span>
+                <Icon className="topic-icon" size={23} strokeWidth={1.7} aria-hidden="true" />
+                <div className="topic-copy"><h3>{title}</h3><p>{description}</p></div>
+                <span className="topic-link-icon" aria-hidden="true"><ArrowUpRight size={18} /></span>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section learning-section" id="pembelajaran">
+          <div className="section-heading learning-heading">
+            <div><h2>Ruang belajar untuk materi dan aktivitas kelas TKJ.</h2></div>
+            <p className="section-intro">
+              Masuk ke dashboard untuk membuka materi yang diterbitkan guru. Kuis dan presensi
+              tersedia di dashboard siswa, bukan di halaman profil.
+            </p>
+          </div>
+          <div className="learning-empty">
+            <div className="empty-mark"><BookOpen size={25} strokeWidth={1.7} /></div>
+            <div className="empty-copy">
+              <span className="state-label"><span /> Ruang belajar TKJ</span>
+              <h3>Materi dan aktivitas sesuai akun masing-masing.</h3>
+              <p>
+                Guru mengelola materi, kuis, dan presensi. Siswa mengakses materi yang diterbitkan,
+                mengerjakan kuis, dan mengisi sesi presensi dari dashboard.
+              </p>
+            </div>
+            <a className="inline-link" href={accountHref}>{accountLabel} <ArrowRight size={16} /></a>
+          </div>
+        </section>
+
+        <section className="section vision-section vision-profile-section" id="visi-misi">
+          <div className="vision-copy">
+            <h2>Terwujudnya sekolah kejuruan juara lahir dan batin.</h2>
+          </div>
+          <div className="mission-copy">
+            <h3>Visi &amp; Misi</h3>
+            <p>
+              Menyelenggarakan pembelajaran Teknik Komputer dan Jaringan yang kuat dalam teori,
+              terampil dalam praktik, serta membentuk lulusan yang berkarakter dan siap menghadapi
+              perkembangan teknologi.
+            </p>
+          </div>
+          <a className="vision-link" href="#kontak" aria-label="Lanjut ke kontak SMKN 1 Garut"><ArrowUpRight size={22} /></a>
+        </section>
+
+        <section className="section contact-section" id="kontak">
+          <div className="section-heading">
+            <div><h2>Informasi SMKN 1 Garut.</h2></div>
+            <p className="section-intro">Hubungi sekolah untuk informasi lebih lanjut tentang program TKJ.</p>
+          </div>
+          <div className="contact-layout">
+            <div className="contact-address">
+              <MapPin size={21} aria-hidden="true" />
+              <div>
+                <span>Alamat sekolah</span>
+                <address>Jl. Cimanuk No. 309A, Pataruman, Tarogong Kidul, Kabupaten Garut, Jawa Barat.</address>
+                <a
+                  className="inline-link"
+                  href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Cari lokasi di Google Maps <ArrowUpRight size={15} />
+                </a>
+              </div>
+            </div>
+            <div className="contact-details">
+              <a href="tel:+62262233316"><Phone className="contact-detail-icon" size={19} aria-hidden="true" /><span><small>Telepon / Fax</small>(0262) 233316</span><ArrowUpRight size={15} className="contact-arrow" aria-hidden="true" /></a>
+              <a href="mailto:smkn1garut@ymail.com"><Mail className="contact-detail-icon" size={19} aria-hidden="true" /><span><small>Email sekolah</small>smkn1garut@ymail.com</span><ArrowUpRight size={15} className="contact-arrow" aria-hidden="true" /></a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer">
+        <a className="footer-brand" href="#beranda">
+          <img src="/LOGO_SMKN1_GARUT.jpeg" alt="" />
+          <span><strong>SMKN 1 Garut</strong><small>Program Teknik Komputer dan Jaringan</small></span>
+        </a>
+        <div className="footer-nav">
+          <a href="#program-tkj">Program TKJ</a>
+          <a href="#pembelajaran">Pembelajaran</a>
+          <a href="#visi-misi">Visi &amp; Misi</a>
+          <a href="#kontak">Kontak</a>
+        </div>
+        <a className="back-to-top" href={accountHref}>{loggedIn ? 'Dashboard' : 'Login guru / siswa'} <ChevronRight size={15} /></a>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
