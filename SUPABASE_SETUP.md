@@ -75,6 +75,14 @@ Pastikan domain email roster merupakan domain yang disetujui sekolah. Akun dibua
 
 Setelah provisioning, periksa daftar user pada **Authentication → Users** dan pastikan profil guru memiliki role `teacher`. Jangan pernah memberikan service-role key kepada guru atau siswa.
 
+### Provisioning manual lewat Dashboard
+
+Daftar email/password lokal ada di `supabase/school-account-credentials.json` dan tidak boleh diunggah ke GitHub. Pada **Authentication → Users**, pilih **Add user → Create new user** untuk tiap baris berstatus `create-user`; gunakan email dan password persis dari file, lalu biarkan **Auto confirm user** aktif.
+
+Akun AJENG NANDINI RIDWAN sudah ada. Buka detail akun itu, pilih **Send password recovery**, lalu tetapkan password dari daftar kredensial saat membuka tautan pemulihan. Jika mailbox email roster tidak dapat menerima email pemulihan, gunakan provisioning server-side di atas sebagai gantinya.
+
+Setelah seluruh akun dibuat atau diatur ulang, jalankan [`supabase/seed-school-accounts.sql`](./supabase/seed-school-accounts.sql) di SQL Editor. Seed mencocokkan email Auth yang ada untuk menyetel nama dan role (`teacher` untuk guru, `student` untuk siswa); ia tidak membuat akun Auth.
+
 ## 5. Jalankan dan uji
 
 ```powershell
