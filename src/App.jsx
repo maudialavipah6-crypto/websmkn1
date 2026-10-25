@@ -30,7 +30,7 @@ const creators = [
   { name: 'M Ahyar Darya', nim: '2657201310' },
   { name: 'Dina Aulia Salsabila', nim: '2657201073019' },
   { name: 'Maudi Al Avipah', nim: '2657201073007' },
-  { name: 'Nisrina Sri Digunakan', nim: '2657201073008' },
+  { name: 'Nisrina Sri Wiguna', nim: '2657201073008' },
 ].map((person, index) => ({ ...person, id: index + 1, photo: '' }));
 
 const topics = [
