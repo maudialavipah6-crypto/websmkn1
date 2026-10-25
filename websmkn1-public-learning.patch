@@ -1,0 +1,381 @@
+From d03cb201c717ae826de9452c2735353dc38cdeb5 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Sun, 25 Oct 2026 15:12:33 +0800
+Subject: [PATCH] feat: public TKJ lessons and school learning profiles
+
+---
+ SUPABASE_SETUP.md                |  2 +
+ src/App.jsx                      | 62 ++++++++++++++++++--------
+ src/components/PublicLessons.jsx | 76 ++++++++++++++++++++++++++++++++
+ src/styles.css                   | 44 ++++++++++++++++++
+ supabase/public-lessons.sql      | 31 +++++++++++++
+ supabase/schema.sql              | 26 +++++++++++
+ 6 files changed, 223 insertions(+), 18 deletions(-)
+ create mode 100644 src/components/PublicLessons.jsx
+ create mode 100644 supabase/public-lessons.sql
+
+diff --git a/SUPABASE_SETUP.md b/SUPABASE_SETUP.md
+index e5ff0c1..79ed58f 100644
+--- a/SUPABASE_SETUP.md
++++ b/SUPABASE_SETUP.md
+@@ -20,6 +20,8 @@ Build produksi mengganti modul roster lokal dengan modul kosong; nama/email rost
+ 
+ Jalankan ulang skrip skema yang telah diperbarui pada proyek yang sebelumnya sudah memakai skema portal agar tabel lampiran, bucket privat, dan kebijakan aksesnya ikut diterapkan. Profil yang sudah ada akan dipertahankan. Akun baru selalu dibuat sebagai siswa; metadata formulir pendaftaran tidak dapat menetapkan peran guru.
+ 
++Untuk proyek yang **sudah** menjalankan skema sebelumnya, jalankan hanya [`supabase/public-lessons.sql`](./supabase/public-lessons.sql) agar pengunjung tanpa login dapat membaca materi terbit dan membuka lampirannya. Jangan jalankan kedua skrip sekaligus; skema penuh sudah mencakup kebijakan akses publik ini. Draf tetap hanya dapat dibaca pemiliknya. Kuis dan presensi tetap memerlukan login. Uji di jendela privat setelah SQL diterapkan.
++
+ ### Siklus materi guru
+ 
+ - Guru dapat membuat, mengedit, menyimpan sebagai draf, menerbitkan, menarik publikasi, dan menghapus materi.
+diff --git a/src/App.jsx b/src/App.jsx
+index 3e851eb..819022d 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -21,6 +21,15 @@ import { useAuth } from './auth/AuthProvider';
+ 
+ const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+ const LoginPage = lazy(() => import('./pages/LoginPage'));
++const PublicLessons = lazy(() => import('./components/PublicLessons'));
++
++// Ganti data dan foto masing-masing anggota setelah tersedia.
++const creators = Array.from({ length: 5 }, (_, index) => ({
++  id: index + 1,
++  name: 'Nama anggota',
++  nim: 'NIM belum diisi',
++  photo: '',
++}));
+ 
+ const topics = [
+   {
+@@ -45,10 +54,11 @@ const topics = [
+ 
+ const navigation = [
+   ['#beranda', 'Beranda'],
++  ['#tujuan', 'Tujuan'],
+   ['#program-tkj', 'Program TKJ'],
+   ['#pembelajaran', 'Pembelajaran'],
+-  ['#visi-misi', 'Visi & Misi'],
+-  ['#kontak', 'Kontak'],
++  ['#profil-sekolah', 'Profil Sekolah'],
++  ['#pembuat', 'Pembuat'],
+ ];
+ 
+ function currentRoute() {
+@@ -206,6 +216,18 @@ function App() {
+           <span className="hero-coordinate" aria-hidden="true">PETA TOPOLOGI · TKJ</span>
+         </section>
+ 
++        <section className="section purpose-section" id="tujuan">
++          <div className="section-heading">
++            <div><span className="section-eyebrow">TENTANG WEB INI</span><h2>Belajar TKJ, dari materi sampai evaluasi.</h2></div>
++            <p className="section-intro">Web pembelajaran ini membantu siswa mengakses materi TKJ dan mengikuti aktivitas kelas. Guru dapat menerbitkan materi serta mengelola kuis dan presensi dari ruang kerja mereka.</p>
++          </div>
++          <div className="purpose-grid">
++            <div><span>01 / AKSES</span><h3>Materi terbuka</h3><p>Modul yang telah diterbitkan bisa dibaca siapa saja tanpa akun.</p></div>
++            <div><span>02 / LATIHAN</span><h3>Evaluasi terarah</h3><p>Siswa yang masuk dapat mengerjakan kuis dan melihat hasilnya.</p></div>
++            <div><span>03 / KELAS</span><h3>Aktivitas tercatat</h3><p>Guru mengelola materi dan sesi presensi melalui dashboard.</p></div>
++          </div>
++        </section>
++
+         <section className="section program-section" id="program-tkj">
+           <div className="section-heading">
+             <div><h2>Belajar memahami cara perangkat saling terhubung.</h2></div>
+@@ -228,24 +250,18 @@ function App() {
+ 
+         <section className="section learning-section" id="pembelajaran">
+           <div className="section-heading learning-heading">
+-            <div><h2>Ruang belajar untuk materi dan aktivitas kelas TKJ.</h2></div>
++            <div><span className="section-eyebrow">PERPUSTAKAAN TKJ</span><h2>Materi yang bisa dibaca kapan saja.</h2></div>
+             <p className="section-intro">
+-              Masuk ke dashboard untuk membuka materi yang diterbitkan guru. Kuis dan presensi
+-              tersedia di dashboard siswa, bukan di halaman profil.
++              Baca modul yang diterbitkan guru tanpa login. Untuk mengerjakan kuis dan mencatat presensi, masuk ke dashboard siswa.
+             </p>
+           </div>
+-          <div className="learning-empty">
+-            <div className="empty-mark"><BookOpen size={25} strokeWidth={1.7} /></div>
+-            <div className="empty-copy">
+-              <span className="state-label"><span /> Ruang belajar TKJ</span>
+-              <h3>Materi dan aktivitas sesuai akun masing-masing.</h3>
+-              <p>
+-                Guru mengelola materi, kuis, dan presensi. Siswa mengakses materi yang diterbitkan,
+-                mengerjakan kuis, dan mengisi sesi presensi dari dashboard.
+-              </p>
+-            </div>
+-            <a className="inline-link" href={accountHref}>{accountLabel} <ArrowRight size={16} /></a>
+-          </div>
++          <Suspense fallback={<p className="public-state" role="status">Menyiapkan daftar materi…</p>}><PublicLessons /></Suspense>
++          <div className="learning-footnote">Kuis dan presensi khusus akun siswa. <a href={accountHref}>{accountLabel} <ArrowRight size={15} /></a></div>
++        </section>
++
++        <section className="section school-section" id="profil-sekolah">
++          <div className="section-heading"><div><span className="section-eyebrow">PROFIL SEKOLAH</span><h2>SMKN 1 Garut.</h2></div><p className="section-intro">Ruang belajar ini berfokus pada Teknik Komputer dan Jaringan (TKJ) di SMKN 1 Garut. Siswa dapat mengenal perangkat komputer, jaringan, dan layanan server melalui materi dan aktivitas belajar.</p></div>
++          <div className="school-details"><div><span>PROGRAM YANG DITAMPILKAN</span><strong>Teknik Komputer dan Jaringan</strong></div><div><span>LOKASI</span><strong>Tarogong Kidul, Kabupaten Garut, Jawa Barat</strong></div><a href="#kontak">Alamat dan kontak sekolah <ArrowUpRight size={17} /></a></div>
+         </section>
+ 
+         <section className="section vision-section vision-profile-section" id="visi-misi">
+@@ -263,6 +279,14 @@ function App() {
+           <a className="vision-link" href="#kontak" aria-label="Lanjut ke kontak SMKN 1 Garut"><ArrowUpRight size={22} /></a>
+         </section>
+ 
++        <section className="section creators-section" id="pembuat">
++          <div className="section-heading"><div><span className="section-eyebrow">DI BALIK WEB</span><h2>Profil pembuat.</h2></div><p className="section-intro">Lima anggota dari Program Studi Sistem Informasi, Institut Pendidikan Indonesia Garut. Nama, NIM, dan foto akan dilengkapi oleh tim.</p></div>
++          <div className="creator-grid">{creators.map((creator) => <article className="creator-card" key={creator.id}>
++            <div className="creator-photo">{creator.photo ? <img src={creator.photo} alt={`Foto ${creator.name}`} loading="lazy" /> : <span aria-label="Foto belum tersedia">FOTO<br />ANGGOTA {String(creator.id).padStart(2, '0')}</span>}</div>
++            <div className="creator-info"><small>ANGGOTA {String(creator.id).padStart(2, '0')}</small><h3>{creator.name}</h3><p>{creator.nim}</p><p>Sistem Informasi<br />Institut Pendidikan Indonesia Garut</p></div>
++          </article>)}</div>
++        </section>
++
+         <section className="section contact-section" id="kontak">
+           <div className="section-heading">
+             <div><h2>Informasi SMKN 1 Garut.</h2></div>
+@@ -298,9 +322,11 @@ function App() {
+           <span><strong>SMKN 1 Garut</strong><small>Program Teknik Komputer dan Jaringan</small></span>
+         </a>
+         <div className="footer-nav">
++          <a href="#tujuan">Tujuan web</a>
+           <a href="#program-tkj">Program TKJ</a>
+           <a href="#pembelajaran">Pembelajaran</a>
+-          <a href="#visi-misi">Visi &amp; Misi</a>
++          <a href="#profil-sekolah">Profil sekolah</a>
++          <a href="#pembuat">Pembuat</a>
+           <a href="#kontak">Kontak</a>
+         </div>
+         <a className="back-to-top" href={accountHref}>{loggedIn ? 'Dashboard' : 'Login guru / siswa'} <ChevronRight size={15} /></a>
+diff --git a/src/components/PublicLessons.jsx b/src/components/PublicLessons.jsx
+new file mode 100644
+index 0000000..f4e7bbd
+--- /dev/null
++++ b/src/components/PublicLessons.jsx
+@@ -0,0 +1,76 @@
++import { useEffect, useState } from 'react';
++import { ArrowLeft, ArrowRight, BookOpen, FileText } from 'lucide-react';
++import { supabase } from '../lib/supabase';
++import { renderLessonHtml } from '../lib/lessonContent';
++
++const bucket = 'tkj-course-assets';
++
++export default function PublicLessons() {
++  const [lessons, setLessons] = useState([]);
++  const [attachments, setAttachments] = useState([]);
++  const [selected, setSelected] = useState(null);
++  const [urls, setUrls] = useState(new Map());
++  const [loading, setLoading] = useState(Boolean(supabase));
++  const [error, setError] = useState('');
++
++  useEffect(() => {
++    if (!supabase) return undefined;
++    let active = true;
++    async function load() {
++      setLoading(true);
++      setError('');
++      const [lessonResult, attachmentResult] = await Promise.all([
++        supabase.from('lessons').select('id, title, summary, content, created_at').eq('is_published', true).order('created_at', { ascending: false }),
++        supabase.from('lesson_attachments').select('id, lesson_id, storage_path, file_name').order('created_at'),
++      ]);
++      if (!active) return;
++      if (lessonResult.error || attachmentResult.error) {
++        setError('Materi belum dapat dimuat. Coba lagi beberapa saat.');
++      } else {
++        setLessons(lessonResult.data || []);
++        setAttachments(attachmentResult.data || []);
++      }
++      setLoading(false);
++    }
++    void load();
++    return () => { active = false; };
++  }, []);
++
++  useEffect(() => {
++    if (!selected || !supabase) return undefined;
++    let active = true;
++    setUrls(new Map());
++    setError('');
++    const files = attachments.filter((file) => file.lesson_id === selected.id);
++    async function sign() {
++      const signed = new Map();
++      for (const file of files) {
++        const { data, error: signError } = await supabase.storage.from(bucket).createSignedUrl(file.storage_path, 3600);
++        if (signError) throw signError;
++        signed.set(file.storage_path, data.signedUrl);
++      }
++      if (active) setUrls(signed);
++    }
++    void sign().catch(() => { if (active) setError('Lampiran gagal dimuat. Materi teks tetap dapat dibaca.'); });
++    return () => { active = false; };
++  }, [selected, attachments]);
++
++  if (selected) {
++    const files = attachments.filter((file) => file.lesson_id === selected.id);
++    return (
++      <div className="public-reader">
++        <button className="public-back" type="button" onClick={() => { setSelected(null); setError(''); }}><ArrowLeft size={16} /> Semua materi</button>
++        <h3>{selected.title}</h3>
++        {selected.summary && <p className="public-summary">{selected.summary}</p>}
++        <div className="lesson-reader-content" dangerouslySetInnerHTML={{ __html: renderLessonHtml(selected.content, urls) }} />
++        {error && <p className="public-error" role="alert">{error}</p>}
++        {files.length > 0 && <div className="public-downloads"><h4>Lampiran</h4><ul>{files.map((file) => <li key={file.id}><FileText size={16} />{urls.has(file.storage_path) ? <a href={urls.get(file.storage_path)} target="_blank" rel="noreferrer">{file.file_name}</a> : <span>{file.file_name} · menyiapkan tautan…</span>}</li>)}</ul></div>}
++      </div>
++    );
++  }
++
++  if (loading) return <p className="public-state" role="status">Memuat materi TKJ…</p>;
++  if (error) return <p className="public-state public-error" role="alert">{error}</p>;
++  if (!supabase || lessons.length === 0) return <div className="public-state"><BookOpen size={25} /><p>Belum ada materi yang diterbitkan. Kunjungi lagi setelah guru mengunggah modul TKJ.</p></div>;
++  return <div className="public-lessons">{lessons.map((lesson, index) => <article className="public-lesson" key={lesson.id}><span className="public-lesson-index">{String(index + 1).padStart(2, '0')} / MATERI</span><h3>{lesson.title}</h3><p>{lesson.summary || 'Materi Teknik Komputer dan Jaringan'}</p><button type="button" onClick={() => setSelected(lesson)}>Baca materi <ArrowRight size={16} /></button></article>)}</div>;
++}
+diff --git a/src/styles.css b/src/styles.css
+index 24ff366..e1fbc9a 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -546,6 +546,50 @@ button:disabled {
+   text-wrap: balance;
+ }
+ 
++.section-eyebrow { display: block; margin-bottom: 13px; color: var(--electric-dark); font-size: .67rem; font-weight: 800; letter-spacing: .15em; }
++.purpose-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
++.purpose-grid > div { padding: 26px 25px 4px 0; }
++.purpose-grid > div + div { padding-left: 25px; border-left: 1px solid var(--line); }
++.purpose-grid span, .school-details span { display: block; margin-bottom: 17px; color: #687e98; font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
++.purpose-grid h3 { margin: 0 0 8px; color: var(--navy); font-size: 1.13rem; }
++.purpose-grid p { max-width: 32ch; margin: 0; color: var(--muted); font-size: .83rem; line-height: 1.7; }
++.public-lessons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
++.public-lesson { display: flex; flex-direction: column; min-height: 215px; padding: 24px; border: 1px solid #cbd8e7; background: #fff; }
++.public-lesson-index { color: var(--electric-dark); font-size: .66rem; font-weight: 800; letter-spacing: .1em; }
++.public-lesson h3, .public-reader h3 { margin: 17px 0 8px; color: var(--navy); font-size: 1.3rem; line-height: 1.25; }
++.public-lesson p, .public-summary { margin: 0 0 22px; color: var(--muted); font-size: .85rem; line-height: 1.7; }
++.public-lesson button, .public-back { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin-top: auto; padding: 0; border: 0; background: none; color: var(--electric-dark); font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer; }
++.public-lesson button:hover, .public-back:hover { text-decoration: underline; }
++.public-state { display: flex; align-items: center; gap: 16px; min-height: 96px; margin: 0; padding: 22px; border: 1px solid #cbd8e7; background: #fff; color: var(--muted); font-size: .85rem; line-height: 1.65; }
++.public-state p { margin: 0; }
++.public-error { color: #a02935; }
++.public-reader { padding: clamp(22px, 4vw, 40px); border: 1px solid #cbd8e7; background: #fff; }
++.public-reader h3 { margin-top: 24px; font-size: clamp(1.5rem, 3vw, 2.2rem); }
++.public-reader .lesson-reader-content { max-width: 76ch; }
++.public-reader .lesson-reader-content img { max-width: 100%; height: auto; }
++.public-downloads { margin-top: 25px; padding-top: 16px; border-top: 1px solid var(--line); }
++.public-downloads h4 { margin: 0 0 12px; }
++.public-downloads ul { margin: 0; padding: 0; list-style: none; }
++.public-downloads li { display: flex; gap: 9px; align-items: center; margin: 8px 0; font-size: .85rem; overflow-wrap: anywhere; }
++.learning-footnote { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 20px; color: var(--muted); font-size: .82rem; }
++.learning-footnote a { display: inline-flex; gap: 5px; align-items: center; color: var(--electric-dark); font-weight: 800; }
++.school-details { display: grid; grid-template-columns: 1fr 1.2fr auto; align-items: end; gap: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
++.school-details strong { color: var(--navy); font-size: .95rem; line-height: 1.5; }
++.school-details a { display: inline-flex; align-items: center; gap: 8px; color: var(--electric-dark); font-size: .8rem; font-weight: 800; }
++.creator-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 13px; }
++.creator-card { min-width: 0; border: 1px solid var(--line); background: #fff; }
++.creator-photo { display: grid; aspect-ratio: 4 / 4.7; place-items: center; overflow: hidden; background: #eaf1f9; color: #637c99; text-align: center; font-size: .71rem; font-weight: 800; letter-spacing: .13em; line-height: 1.7; }
++.creator-photo img { width: 100%; height: 100%; object-fit: cover; }
++.creator-info { padding: 17px 15px 20px; }
++.creator-info small { color: var(--electric-dark); font-size: .61rem; font-weight: 800; letter-spacing: .1em; }
++.creator-info h3 { margin: 9px 0 3px; color: var(--navy); font-size: .95rem; }
++.creator-info p { margin: 0 0 12px; color: var(--muted); font-size: .72rem; line-height: 1.55; overflow-wrap: anywhere; }
++.creator-info p:last-child { margin-bottom: 0; }
++@media (max-width: 1020px) { .creator-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
++@media (max-width: 800px) { .purpose-grid { grid-template-columns: 1fr; } .purpose-grid > div, .purpose-grid > div + div { padding: 19px 0; border-left: 0; border-bottom: 1px solid var(--line); } .school-details { grid-template-columns: 1fr 1fr; } .school-details a { grid-column: 1 / -1; } }
++@media (max-width: 600px) { .public-lessons, .school-details, .creator-grid { grid-template-columns: 1fr; } .school-details a { grid-column: auto; } .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .creator-photo { aspect-ratio: 1; } }
++@media (max-width: 380px) { .creator-grid { grid-template-columns: 1fr; } }
++
+ .section-intro {
+   max-width: 47ch;
+   margin: 0 0 3px;
+diff --git a/supabase/public-lessons.sql b/supabase/public-lessons.sql
+new file mode 100644
+index 0000000..2457c74
+--- /dev/null
++++ b/supabase/public-lessons.sql
+@@ -0,0 +1,31 @@
++-- Jalankan satu kali di SQL Editor untuk proyek yang sudah menerapkan schema.sql.
++-- Hanya materi terbit dan lampirannya yang dapat dibaca pengunjung tanpa akun.
++begin;
++
++grant select on public.lessons, public.lesson_attachments to anon;
++
++drop policy if exists "Visitors can read published lessons" on public.lessons;
++create policy "Visitors can read published lessons"
++  on public.lessons for select to anon using (is_published);
++
++drop policy if exists "Visitors can read published lesson attachments" on public.lesson_attachments;
++create policy "Visitors can read published lesson attachments"
++  on public.lesson_attachments for select to anon
++  using (exists (
++    select 1 from public.lessons as lesson
++    where lesson.id = lesson_id and lesson.is_published
++  ));
++
++drop policy if exists "Visitors read assets for published TKJ lessons" on storage.objects;
++create policy "Visitors read assets for published TKJ lessons"
++  on storage.objects for select to anon
++  using (
++    bucket_id = 'tkj-course-assets'
++    and exists (
++      select 1 from public.lesson_attachments as attachment
++      join public.lessons as lesson on lesson.id = attachment.lesson_id
++      where attachment.storage_path = name and lesson.is_published
++    )
++  );
++
++commit;
+diff --git a/supabase/schema.sql b/supabase/schema.sql
+index 864bc76..e725a2b 100644
+--- a/supabase/schema.sql
++++ b/supabase/schema.sql
+@@ -312,8 +312,10 @@ from public, anon, authenticated;
+ grant select on public.profiles to authenticated;
+ grant update (display_name) on public.profiles to authenticated;
+ grant select, insert, update, delete on public.lessons, public.quizzes to authenticated;
++grant select on public.lessons to anon;
+ revoke all on public.lesson_attachments from public, anon, authenticated;
+ grant select, insert, delete on public.lesson_attachments to authenticated;
++grant select on public.lesson_attachments to anon;
+ grant select, insert, update, delete on public.quiz_questions, public.quiz_answer_keys to authenticated;
+ grant select, insert on public.quiz_attempts to authenticated;
+ grant select, insert, update, delete on public.attendance_sessions to authenticated;
+@@ -338,6 +340,10 @@ create policy "Authenticated users can read published lessons and teachers can r
+   on public.lessons for select to authenticated
+   using (is_published or author_id = (select auth.uid()));
+ 
++drop policy if exists "Visitors can read published lessons" on public.lessons;
++create policy "Visitors can read published lessons"
++  on public.lessons for select to anon using (is_published);
++
+ drop policy if exists "Teachers can create their own lessons"
+   on public.lessons;
+ create policy "Teachers can create their own lessons"
+@@ -381,6 +387,14 @@ create policy "Users can read attachments for visible lessons"
+     )
+   );
+ 
++drop policy if exists "Visitors can read published lesson attachments" on public.lesson_attachments;
++create policy "Visitors can read published lesson attachments"
++  on public.lesson_attachments for select to anon
++  using (exists (
++    select 1 from public.lessons as lesson
++    where lesson.id = lesson_id and lesson.is_published
++  ));
++
+ drop policy if exists "Teachers can attach files to their own lessons"
+   on public.lesson_attachments;
+ create policy "Teachers can attach files to their own lessons"
+@@ -740,6 +754,18 @@ create policy "Users read assets for visible TKJ lessons"
+     )
+   );
+ 
++drop policy if exists "Visitors read assets for published TKJ lessons" on storage.objects;
++create policy "Visitors read assets for published TKJ lessons"
++  on storage.objects for select to anon
++  using (
++    bucket_id = 'tkj-course-assets'
++    and exists (
++      select 1 from public.lesson_attachments as attachment
++      join public.lessons as lesson on lesson.id = attachment.lesson_id
++      where attachment.storage_path = name and lesson.is_published
++    )
++  );
++
+ drop policy if exists "Teachers delete their TKJ course assets" on storage.objects;
+ create policy "Teachers delete their TKJ course assets"
+   on storage.objects for delete to authenticated
+-- 
+2.51.1
+

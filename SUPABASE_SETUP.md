@@ -20,6 +20,8 @@ Build produksi mengganti modul roster lokal dengan modul kosong; nama/email rost
 
 Jalankan ulang skrip skema yang telah diperbarui pada proyek yang sebelumnya sudah memakai skema portal agar tabel lampiran, bucket privat, dan kebijakan aksesnya ikut diterapkan. Profil yang sudah ada akan dipertahankan. Akun baru selalu dibuat sebagai siswa; metadata formulir pendaftaran tidak dapat menetapkan peran guru.
 
+Untuk proyek yang **sudah** menjalankan skema sebelumnya, jalankan hanya [`supabase/public-lessons.sql`](./supabase/public-lessons.sql) agar pengunjung tanpa login dapat membaca materi terbit dan membuka lampirannya. Jangan jalankan kedua skrip sekaligus; skema penuh sudah mencakup kebijakan akses publik ini. Draf tetap hanya dapat dibaca pemiliknya. Kuis dan presensi tetap memerlukan login. Uji di jendela privat setelah SQL diterapkan.
+
 ### Siklus materi guru
 
 - Guru dapat membuat, mengedit, menyimpan sebagai draf, menerbitkan, menarik publikasi, dan menghapus materi.

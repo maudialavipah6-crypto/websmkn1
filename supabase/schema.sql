@@ -312,8 +312,10 @@ from public, anon, authenticated;
 grant select on public.profiles to authenticated;
 grant update (display_name) on public.profiles to authenticated;
 grant select, insert, update, delete on public.lessons, public.quizzes to authenticated;
+grant select on public.lessons to anon;
 revoke all on public.lesson_attachments from public, anon, authenticated;
 grant select, insert, delete on public.lesson_attachments to authenticated;
+grant select on public.lesson_attachments to anon;
 grant select, insert, update, delete on public.quiz_questions, public.quiz_answer_keys to authenticated;
 grant select, insert on public.quiz_attempts to authenticated;
 grant select, insert, update, delete on public.attendance_sessions to authenticated;
@@ -337,6 +339,10 @@ drop policy if exists "Authenticated users can read published lessons and teache
 create policy "Authenticated users can read published lessons and teachers can read drafts"
   on public.lessons for select to authenticated
   using (is_published or author_id = (select auth.uid()));
+
+drop policy if exists "Visitors can read published lessons" on public.lessons;
+create policy "Visitors can read published lessons"
+  on public.lessons for select to anon using (is_published);
 
 drop policy if exists "Teachers can create their own lessons"
   on public.lessons;
@@ -380,6 +386,14 @@ create policy "Users can read attachments for visible lessons"
       where lesson.id = lesson_id and lesson.is_published
     )
   );
+
+drop policy if exists "Visitors can read published lesson attachments" on public.lesson_attachments;
+create policy "Visitors can read published lesson attachments"
+  on public.lesson_attachments for select to anon
+  using (exists (
+    select 1 from public.lessons as lesson
+    where lesson.id = lesson_id and lesson.is_published
+  ));
 
 drop policy if exists "Teachers can attach files to their own lessons"
   on public.lesson_attachments;
@@ -737,6 +751,18 @@ create policy "Users read assets for visible TKJ lessons"
           attachment.author_id = (select auth.uid())
           or lesson.is_published
         )
+    )
+  );
+
+drop policy if exists "Visitors read assets for published TKJ lessons" on storage.objects;
+create policy "Visitors read assets for published TKJ lessons"
+  on storage.objects for select to anon
+  using (
+    bucket_id = 'tkj-course-assets'
+    and exists (
+      select 1 from public.lesson_attachments as attachment
+      join public.lessons as lesson on lesson.id = attachment.lesson_id
+      where attachment.storage_path = name and lesson.is_published
     )
   );
 
