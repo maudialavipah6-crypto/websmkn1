@@ -1,0 +1,143 @@
+From ae662bf3b63c782ac402188903a658d2084c6398 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Sun, 25 Oct 2026 17:59:38 +0900
+Subject: [PATCH] feat: add complete school profile page and team names
+
+---
+ src/App.jsx                     | 25 ++++++++++++++-----------
+ src/pages/SchoolProfilePage.jsx | 29 +++++++++++++++++++++++++++++
+ src/styles.css                  | 23 +++++++++++++++++++++++
+ 3 files changed, 66 insertions(+), 11 deletions(-)
+ create mode 100644 src/pages/SchoolProfilePage.jsx
+
+diff --git a/src/App.jsx b/src/App.jsx
+index 819022d..c5b682a 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -22,14 +22,16 @@ import { useAuth } from './auth/AuthProvider';
+ const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+ const LoginPage = lazy(() => import('./pages/LoginPage'));
+ const PublicLessons = lazy(() => import('./components/PublicLessons'));
++const SchoolProfilePage = lazy(() => import('./pages/SchoolProfilePage'));
+ 
+ // Ganti data dan foto masing-masing anggota setelah tersedia.
+-const creators = Array.from({ length: 5 }, (_, index) => ({
+-  id: index + 1,
+-  name: 'Nama anggota',
+-  nim: 'NIM belum diisi',
+-  photo: '',
+-}));
++const creators = [
++  { name: 'Khoir Nur Wahid', nim: '2657201073021' },
++  { name: 'M Ahyar Darya', nim: '2657201310' },
++  { name: 'Dina Aulia Salsabila', nim: '2657201073019' },
++  { name: 'Maudi Al Avipah', nim: '2657201073007' },
++  { name: 'Nisrina Sri Digunakan', nim: '2657201073008' },
++].map((person, index) => ({ ...person, id: index + 1, photo: '' }));
+ 
+ const topics = [
+   {
+@@ -57,7 +59,7 @@ const navigation = [
+   ['#tujuan', 'Tujuan'],
+   ['#program-tkj', 'Program TKJ'],
+   ['#pembelajaran', 'Pembelajaran'],
+-  ['#profil-sekolah', 'Profil Sekolah'],
++  ['#/profil-sekolah', 'Profil Sekolah'],
+   ['#pembuat', 'Pembuat'],
+ ];
+ 
+@@ -94,6 +96,10 @@ function App() {
+     );
+   }
+ 
++  if (route === 'profil-sekolah') {
++    return <Suspense fallback={<div className="route-loading" role="status">Memuat profil sekolah…</div>}><SchoolProfilePage /></Suspense>;
++  }
++
+   if (route === 'dashboard') {
+     if (authLoading) {
+       return <div className="route-loading" role="status">Memeriksa sesi akun…</div>;
+@@ -259,10 +265,7 @@ function App() {
+           <div className="learning-footnote">Kuis dan presensi khusus akun siswa. <a href={accountHref}>{accountLabel} <ArrowRight size={15} /></a></div>
+         </section>
+ 
+-        <section className="section school-section" id="profil-sekolah">
+-          <div className="section-heading"><div><span className="section-eyebrow">PROFIL SEKOLAH</span><h2>SMKN 1 Garut.</h2></div><p className="section-intro">Ruang belajar ini berfokus pada Teknik Komputer dan Jaringan (TKJ) di SMKN 1 Garut. Siswa dapat mengenal perangkat komputer, jaringan, dan layanan server melalui materi dan aktivitas belajar.</p></div>
+-          <div className="school-details"><div><span>PROGRAM YANG DITAMPILKAN</span><strong>Teknik Komputer dan Jaringan</strong></div><div><span>LOKASI</span><strong>Tarogong Kidul, Kabupaten Garut, Jawa Barat</strong></div><a href="#kontak">Alamat dan kontak sekolah <ArrowUpRight size={17} /></a></div>
+-        </section>
++        <section className="section school-section" id="profil-sekolah"><div className="section-heading"><div><span className="section-eyebrow">PROFIL SEKOLAH</span><h2>Kenali SMKN 1 Garut.</h2></div><p className="section-intro">Lihat identitas, sejarah singkat, program keahlian, dan informasi resmi sekolah.</p></div><a className="inline-link" href="#/profil-sekolah">Lihat profil lengkap <ArrowRight size={16}/></a></section>
+ 
+         <section className="section vision-section vision-profile-section" id="visi-misi">
+           <div className="vision-copy">
+diff --git a/src/pages/SchoolProfilePage.jsx b/src/pages/SchoolProfilePage.jsx
+new file mode 100644
+index 0000000..f8bd0a1
+--- /dev/null
++++ b/src/pages/SchoolProfilePage.jsx
+@@ -0,0 +1,29 @@
++import { ArrowLeft, ArrowUpRight, MapPin, Phone, Mail, School, CalendarDays, Award } from 'lucide-react';
++
++const programs = [
++  'Akuntansi dan Keuangan Lembaga',
++  'Desain Komunikasi Visual',
++  'Manajemen Perkantoran dan Layanan Bisnis',
++  'Pemasaran',
++  'Pengembangan Perangkat Lunak dan Gim',
++  'Teknik Energi Terbarukan',
++  'Teknik Jaringan Komputer dan Telekomunikasi',
++  'Teknik Laboratorium Medik',
++  'Teknik Logistik',
++  'Teknologi Farmasi',
++];
++
++export default function SchoolProfilePage() {
++  return <div className="page-shell"><header className="topbar"><a className="brand-wrap" href="#beranda"><img className="brand-logo" src="/LOGO_SMKN1_GARUT.jpeg" alt=""/><span className="brand-copy"><strong>SMKN 1 Garut</strong><span>Profil Sekolah</span></span></a><a className="header-cta" href="#/login">Login guru / siswa <ArrowUpRight size={16}/></a></header><main className="school-profile-page">
++    <a className="school-profile-back" href="#beranda"><ArrowLeft size={16}/> Kembali ke beranda</a>
++    <header className="school-profile-hero">
++      <span>PROFIL SEKOLAH · GARUT</span><h1>SMK Negeri 1 Garut</h1>
++      <p>Sekolah menengah kejuruan negeri di Kabupaten Garut yang menyelenggarakan pendidikan kejuruan untuk menyiapkan lulusan kompeten dan siap melanjutkan karier.</p>
++      <div className="school-profile-facts"><div><School/><span>NPSN<strong>20209201</strong></span></div><div><CalendarDays/><span>Berdiri<strong>24 Juli 1959</strong></span></div><div><Award/><span>Akreditasi<strong>A · data 2022</strong></span></div></div>
++    </header>
++    <section className="school-profile-block"><div><span className="section-eyebrow">TENTANG SEKOLAH</span><h2>Pendidikan kejuruan untuk beragam bidang.</h2></div><p>SMKN 1 Garut merupakan sekolah negeri berbentuk SMK yang berlokasi di Kecamatan Tarogong Kidul. Data pemerintah mencatat sekolah ini berdiri pada 1959. Saat ini, sekolah memiliki program keahlian di bidang bisnis, teknologi, desain, kesehatan, dan teknik.</p></section>
++    <section className="school-profile-block programs-block"><div><span className="section-eyebrow">PROGRAM KEAHLIAN</span><h2>Pilihan bidang keahlian.</h2><p>Daftar program berdasarkan data pendidikan pemerintah yang tersedia.</p></div><ol>{programs.map((program,i)=><li key={program}><span>{String(i+1).padStart(2,'0')}</span>{program}</li>)}</ol></section>
++    <section className="school-profile-block contact-block"><div><span className="section-eyebrow">KUNJUNGI</span><h2>Informasi dan lokasi.</h2></div><div className="school-contact-list"><p><MapPin/><span>Jl. Cimanuk No. 309A, Pataruman, Tarogong Kidul, Kabupaten Garut, Jawa Barat 44151</span></p><a href="tel:+62262233316"><Phone/><span>(0262) 233316</span><ArrowUpRight/></a><a href="mailto:smkn1garut@ymail.com"><Mail/><span>smkn1garut@ymail.com</span><ArrowUpRight/></a><a href="https://smknegeri1garut.sch.id/" target="_blank" rel="noreferrer"><School/><span>Website resmi sekolah</span><ArrowUpRight/></a></div></section>
++    <footer className="school-profile-source">Sumber: <a href="https://referensi.data.kemendikdasmen.go.id/pendidikan/npsn/20209201" target="_blank" rel="noreferrer">Data Pendidikan Kemendikdasmen</a> dan <a href="https://smknegeri1garut.sch.id/" target="_blank" rel="noreferrer">situs resmi SMKN 1 Garut</a>. Informasi akreditasi mengacu pada data tahun 2022.</footer>
++  </main><footer className="school-profile-footer"><a href="#beranda">Kembali ke beranda</a><span>SMKN 1 Garut · Kabupaten Garut</span></footer></div>;
++}
+diff --git a/src/styles.css b/src/styles.css
+index e1fbc9a..d79a477 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -547,6 +547,29 @@ button:disabled {
+ }
+ 
+ .section-eyebrow { display: block; margin-bottom: 13px; color: var(--electric-dark); font-size: .67rem; font-weight: 800; letter-spacing: .15em; }
++.school-profile-page { width: min(1080px, calc(100% - 40px)); margin: 42px auto 70px; }
++.school-profile-back { display: inline-flex; align-items: center; gap: 8px; color: var(--electric-dark); font-size: .82rem; font-weight: 800; }
++.school-profile-hero { margin-top: 22px; padding: clamp(28px, 6vw, 68px); background: var(--navy); color: #fff; }
++.school-profile-hero > span { color: #a8effb; font-size: .68rem; font-weight: 800; letter-spacing: .15em; }
++.school-profile-hero h1 { max-width: 14ch; margin: 18px 0; font-size: clamp(2.5rem, 7vw, 5.5rem); line-height: .98; letter-spacing: -.05em; }
++.school-profile-hero > p { max-width: 64ch; color: #d1deef; line-height: 1.8; }
++.school-profile-facts { display: flex; flex-wrap: wrap; gap: 26px 44px; margin-top: 35px; padding-top: 25px; border-top: 1px solid #ffffff35; }
++.school-profile-facts > div { display: flex; align-items: center; gap: 12px; color: var(--cyan); }
++.school-profile-facts span,.school-profile-facts strong { display: block; color: #d1deef; font-size: .72rem; }
++.school-profile-facts strong { margin-top: 4px; color: white; font-size: .9rem; }
++.school-profile-block { display: grid; grid-template-columns: .8fr 1.2fr; gap: 42px; padding: 48px 0; border-bottom: 1px solid var(--line); }
++.school-profile-block h2 { margin: 0; color: var(--navy); font-size: clamp(1.65rem, 3vw, 2.4rem); line-height: 1.15; }
++.school-profile-block p { margin: 0; color: var(--muted); line-height: 1.85; }
++.programs-block ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
++.programs-block li { display: flex; gap: 18px; padding: 13px 0; border-bottom: 1px solid var(--line); color: var(--ink); font-size: .88rem; }
++.programs-block li span { color: var(--electric-dark); font-size: .72rem; font-weight: 800; }
++.school-contact-list p,.school-contact-list a { display: flex; align-items: center; gap: 13px; color: var(--ink); font-size: .86rem; line-height: 1.7; }
++.school-contact-list svg { flex: 0 0 18px; color: var(--electric-dark); }
++.school-contact-list a { justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--line); }
++.school-profile-source { padding: 24px 0; color: var(--muted); font-size: .72rem; line-height: 1.7; }
++.school-profile-source a,.school-profile-footer a { color: var(--electric-dark); font-weight: 700; }
++.school-profile-footer { display: flex; justify-content: space-between; gap: 20px; padding: 22px max(24px, calc((100% - 1080px) / 2)); background: var(--navy); color: #d1deef; font-size: .8rem; }
++@media(max-width:700px){.school-profile-page{width:calc(100% - 28px);margin-top:26px}.school-profile-block{grid-template-columns:1fr;gap:18px;padding:32px 0}.school-profile-facts{gap:18px 24px}.school-profile-footer{flex-direction:column}}
+ .purpose-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+ .purpose-grid > div { padding: 26px 25px 4px 0; }
+ .purpose-grid > div + div { padding-left: 25px; border-left: 1px solid var(--line); }
+-- 
+2.51.1
+

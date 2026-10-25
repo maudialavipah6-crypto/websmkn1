@@ -22,14 +22,16 @@ import { useAuth } from './auth/AuthProvider';
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const PublicLessons = lazy(() => import('./components/PublicLessons'));
+const SchoolProfilePage = lazy(() => import('./pages/SchoolProfilePage'));
 
 // Ganti data dan foto masing-masing anggota setelah tersedia.
-const creators = Array.from({ length: 5 }, (_, index) => ({
-  id: index + 1,
-  name: 'Nama anggota',
-  nim: 'NIM belum diisi',
-  photo: '',
-}));
+const creators = [
+  { name: 'Khoir Nur Wahid', nim: '2657201073021' },
+  { name: 'M Ahyar Darya', nim: '2657201310' },
+  { name: 'Dina Aulia Salsabila', nim: '2657201073019' },
+  { name: 'Maudi Al Avipah', nim: '2657201073007' },
+  { name: 'Nisrina Sri Digunakan', nim: '2657201073008' },
+].map((person, index) => ({ ...person, id: index + 1, photo: '' }));
 
 const topics = [
   {
@@ -57,7 +59,7 @@ const navigation = [
   ['#tujuan', 'Tujuan'],
   ['#program-tkj', 'Program TKJ'],
   ['#pembelajaran', 'Pembelajaran'],
-  ['#profil-sekolah', 'Profil Sekolah'],
+  ['#/profil-sekolah', 'Profil Sekolah'],
   ['#pembuat', 'Pembuat'],
 ];
 
@@ -92,6 +94,10 @@ function App() {
         <LoginPage />
       </Suspense>
     );
+  }
+
+  if (route === 'profil-sekolah') {
+    return <Suspense fallback={<div className="route-loading" role="status">Memuat profil sekolah…</div>}><SchoolProfilePage /></Suspense>;
   }
 
   if (route === 'dashboard') {
@@ -259,10 +265,7 @@ function App() {
           <div className="learning-footnote">Kuis dan presensi khusus akun siswa. <a href={accountHref}>{accountLabel} <ArrowRight size={15} /></a></div>
         </section>
 
-        <section className="section school-section" id="profil-sekolah">
-          <div className="section-heading"><div><span className="section-eyebrow">PROFIL SEKOLAH</span><h2>SMKN 1 Garut.</h2></div><p className="section-intro">Ruang belajar ini berfokus pada Teknik Komputer dan Jaringan (TKJ) di SMKN 1 Garut. Siswa dapat mengenal perangkat komputer, jaringan, dan layanan server melalui materi dan aktivitas belajar.</p></div>
-          <div className="school-details"><div><span>PROGRAM YANG DITAMPILKAN</span><strong>Teknik Komputer dan Jaringan</strong></div><div><span>LOKASI</span><strong>Tarogong Kidul, Kabupaten Garut, Jawa Barat</strong></div><a href="#kontak">Alamat dan kontak sekolah <ArrowUpRight size={17} /></a></div>
-        </section>
+        <section className="section school-section" id="profil-sekolah"><div className="section-heading"><div><span className="section-eyebrow">PROFIL SEKOLAH</span><h2>Kenali SMKN 1 Garut.</h2></div><p className="section-intro">Lihat identitas, sejarah singkat, program keahlian, dan informasi resmi sekolah.</p></div><a className="inline-link" href="#/profil-sekolah">Lihat profil lengkap <ArrowRight size={16}/></a></section>
 
         <section className="section vision-section vision-profile-section" id="visi-misi">
           <div className="vision-copy">
