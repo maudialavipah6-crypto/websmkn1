@@ -121,3 +121,24 @@
   .question-editor .question-choice { grid-template-columns: 20px minmax(0,1fr); }
   .add-question-button { width: 100%; }
 }
+
+/* Consistent controls: radio geometry must not inherit text-field padding. */
+.question-editor > legend.sr-only { width: 1px; padding: 0; }
+.question-editor .question-choice input[type="radio"] { min-height: 18px; min-width: 18px; padding: 0; border: 0; border-radius: 50%; }
+.question-editor .question-choice input:not([type="radio"]) { border: 0; background: transparent; font-size: 1rem; }
+.question-editor .question-choice:focus-within { outline: 2px solid #2457a3; outline-offset: 2px; }
+.question-editor .question-remove, .resource-actions button { min-height: 44px; font-size: .875rem; }
+.owned-resource-heading strong { white-space: normal; overflow-wrap: anywhere; font-size: .9375rem; }
+.owned-resource-heading small, .owned-resource > p { font-size: .8125rem; }
+.student-resource-card > button, .dashboard-primary { min-height: 44px; font-size: .875rem; }
+.mobile-drawer { padding-bottom: env(safe-area-inset-bottom); }
+@media (max-width: 800px) {
+  .auth-brand-panel { min-height: 0; padding: 20px; }
+  .auth-brand-content { padding: 12px 0; }
+  .auth-brand-content h1 { font-size: 1.75rem; max-width: 24ch; }
+  .auth-connection-art, .auth-panel-footer { display: none; }
+  .auth-form-panel { padding: 20px 16px; }
+}
+
+.account-search { display: grid; gap: 8px; margin-block: 16px; font-size: .875rem; }
+.account-search input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #cbd8e7; border-radius: 8px; font: inherit; font-size: 16px; }

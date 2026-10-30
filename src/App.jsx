@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -70,6 +70,7 @@ function currentRoute() {
 import ResponsiveSidebar from './components/ResponsiveSidebar';
 
 function App() {
+  const reduceMotion = useReducedMotion();
   const { session, profile, loading: authLoading, isPasswordRecovery } = useAuth();
   const [route, setRoute] = useState(currentRoute);
 
@@ -149,7 +150,7 @@ function App() {
         <section className="hero" id="beranda">
           <motion.div
             className="hero-copy"
-            initial={{ opacity: 0, y: 22 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
@@ -178,7 +179,7 @@ function App() {
             className="topology-panel"
             role="img"
             aria-label="Diagram topologi jaringan TKJ"
-            initial={{ opacity: 0, scale: 0.97 }}
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
           >
@@ -273,7 +274,7 @@ function App() {
         </section>
 
         <section className="section creators-section" id="pembuat">
-          <div className="section-heading"><div><span className="section-eyebrow">DI BALIK WEB</span><h2>Profil pembuat.</h2></div><p className="section-intro">Lima anggota dari Program Studi Sistem Informasi, Institut Pendidikan Indonesia Garut. Nama, NIM, dan foto akan dilengkapi oleh tim.</p></div>
+          <div className="section-heading"><div><span className="section-eyebrow">DI BALIK WEB</span><h2>Profil pembuat.</h2></div><p className="section-intro">Lima anggota dari Program Studi Sistem Informasi, Institut Pendidikan Indonesia Garut. Profil anggota tim pengembang web pembelajaran.</p></div>
           <div className="creator-grid">{creators.map((creator) => <article className="creator-card" key={creator.id}>
             <div className="creator-photo">{creator.photo ? <img src={creator.photo} alt={`Foto ${creator.name}`} loading="lazy" /> : <span aria-label="Foto belum tersedia">FOTO<br />ANGGOTA {String(creator.id).padStart(2, '0')}</span>}</div>
             <div className="creator-info"><small>ANGGOTA {String(creator.id).padStart(2, '0')}</small><h3>{creator.name}</h3><p>{creator.nim}</p><p>Sistem Informasi<br />Institut Pendidikan Indonesia Garut</p></div>
