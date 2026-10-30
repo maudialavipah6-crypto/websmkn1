@@ -99,6 +99,38 @@
   .dashboard-content { padding-inline: 12px; }
 }
 
+/* Final viewport guards: avoid overflow in dense dashboard and forms. */
+html, body, #root { min-width: 320px; }
+.page-shell, .dashboard-layout, .auth-page, .school-profile-page { width: 100%; min-width: 0; }
+.dashboard-layout, .dashboard-main, .dashboard-content, .workspace-grid, .dashboard-grid { min-width: 0; }
+.workspace-form, .admin-account-form, .lesson-editor-field, .rich-text-editor { min-width: 0; }
+.rich-text-toolbar { flex-wrap: wrap; }
+.dashboard-panel, .owned-resource, .student-resource-card { overflow-wrap: anywhere; }
+.dashboard-user { min-width: 0; }
+.dashboard-user > span { min-width: 0; }
+.dashboard-user strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-account-row { min-width: 0; }
+.admin-account-actions { display: flex; flex-wrap: wrap; }
+@media (max-width: 800px) {
+  .auth-brand-panel { min-height: 0; }
+  .dashboard-content { padding-bottom: max(32px, env(safe-area-inset-bottom)); }
+  .workspace-actions > *, .lesson-form-actions > *, .resource-actions > * { flex: 1 1 auto; }
+  .dashboard-panel { padding: clamp(12px, 4vw, 18px); }
+}
+@media (max-width: 360px) {
+  .dashboard-topbar { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 4px; padding-inline: 8px; }
+  .dashboard-user { gap: 5px; }
+  .dashboard-user strong { max-width: 68px; }
+  .dashboard-content { padding-inline: 10px; }
+  .auth-form-panel { padding-inline: 8px; }
+  .auth-form-wrap { padding-inline: 12px; }
+}
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 900px) {
+  .mobile-drawer { height: 100dvh; overflow-y: auto; }
+  .auth-brand-panel { padding-block: 12px; }
+  .auth-brand-content { padding-block: 8px; }
+}
+
 /* Quiz authoring: consistent fieldset legend and clear add-question action. */
 .quiz-author-form { gap: 14px; }
 .question-editor { position: relative; gap: 12px; margin: 0; padding: 12px; border-color: #dce3eb; border-radius: 10px; background: #fbfcfe; }
