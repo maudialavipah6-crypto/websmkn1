@@ -7,7 +7,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "supabase:provision": "node supabase/provision-school-users.mjs"
+    "supabase:provision": "node supabase/provision-school-users.mjs",
+    "supabase:bootstrap-admin": "node supabase/bootstrap-admin.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

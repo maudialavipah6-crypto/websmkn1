@@ -2,6 +2,37 @@
 
 Portal memakai Supabase Auth, database, dan Supabase Storage untuk akun siswa/guru, materi TKJ, lampiran privat, kuis, hasil kuis, dan presensi. Supabase belum terhubung sampai langkah berikut dilakukan untuk proyek milik sekolah.
 
+## Aktivasi login ID dan dashboard admin
+
+Versi terbaru tidak meminta email kepada pengguna. Siswa, guru, dan admin masuk memakai **ID Pengguna** yang dibuat admin, misalnya `SISWA001`, `GURU001`, atau `ADMIN001`. Email internal hanya dipakai Supabase di belakang layar dan tidak ditampilkan di portal.
+
+Untuk proyek Supabase yang sudah berjalan:
+
+1. Jalankan seluruh isi [`supabase/id-user-migration.sql`](./supabase/id-user-migration.sql) melalui **SQL Editor**. Akun lama otomatis memperoleh ID sementara; admin dapat menggantinya dari dashboard.
+2. Deploy dua Edge Function dari terminal yang sudah login ke Supabase CLI:
+
+```powershell
+supabase functions deploy login-id --no-verify-jwt
+supabase functions deploy admin-users
+```
+
+`login-id` memang harus dapat dipanggil sebelum pengguna mempunyai sesi, sedangkan `admin-users` tetap memeriksa sesi dan role admin pada server. Jangan pernah menaruh service-role key di Vercel atau variabel `VITE_*`.
+
+3. Buat akun admin pertama dari komputer pengelola:
+
+```powershell
+$env:SUPABASE_URL = "https://your-project-ref.supabase.co"
+$secureKey = Read-Host "Supabase service-role key" -AsSecureString
+$env:SUPABASE_SERVICE_ROLE_KEY = [System.Net.NetworkCredential]::new("", $secureKey).Password
+npm run supabase:bootstrap-admin
+Remove-Item Env:SUPABASE_SERVICE_ROLE_KEY
+Remove-Item Env:SUPABASE_URL
+```
+
+Terminal menampilkan ID `ADMIN001` dan satu password sementara. Simpan password tersebut saat muncul karena password Auth tidak dapat dibaca kembali. Setelah login, admin dapat membuat akun, mengubah ID/nama/peran/status, mengganti password, dan menghapus akun langsung dari dashboard.
+
+Password minimal delapan karakter. Jika pengguna lupa password, admin membuka akun terkait, mengisi **Kata sandi baru**, lalu menyimpan perubahan. Password lama tidak dapat dan tidak perlu ditampilkan.
+
 ## Pratinjau lokal sebelum Supabase siap
 
 Jalankan situs dengan `npm run dev`. Saat Supabase belum dikonfigurasi, development mode menampilkan roster lokal dari `src/auth/schoolAccounts.js` untuk pratinjau dashboard. Kata sandi `local-preview-only` hanya untuk simulasi lokal, bukan kata sandi akun Auth sekolah.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -6,9 +6,9 @@ import {
   Eye,
   EyeOff,
   LockKeyhole,
-  Mail,
   Router,
   ShieldCheck,
+  UserRound,
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 
@@ -21,137 +21,56 @@ function LoginPage() {
     session,
     profile,
     profileError,
-    isPasswordRecovery,
-    clearPasswordRecovery,
     refreshProfile,
     signInDemo,
   } = useAuth();
-  const [mode, setMode] = useState('signin');
-  const [displayName, setDisplayName] = useState('');
-  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [demoUsers, setDemoUsers] = useState([]);
-
-  useEffect(() => {
-    if (!demoModeAvailable) return undefined;
-
-    let mounted = true;
-    import('../auth/schoolAccounts')
-      .then(({ demoUsers: accounts }) => {
-        if (mounted) setDemoUsers(accounts);
-      })
-      .catch((error) => {
-        if (mounted) {
-          setErrorMessage(error instanceof Error ? error.message : 'Akun sekolah tidak dapat dimuat.');
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [demoModeAvailable]);
-
-  const recoveryMode = isPasswordRecovery || mode === 'recovery';
-
-  function switchMode(nextMode) {
-    setMode(nextMode);
-    setMessage('');
-    setErrorMessage('');
-  }
 
   async function handleSubmit(event) {
     event.preventDefault();
     setBusy(true);
-    setMessage('');
     setErrorMessage('');
 
     try {
-      if (mode === 'signin' && !recoveryMode && demoModeAvailable) {
-        await signInDemo(email, password);
+      if (demoModeAvailable) {
+        await signInDemo(userId, password);
         window.location.hash = '#/dashboard';
         return;
       }
 
       if (!configured || !supabase) {
-        throw new Error('Pendaftaran dan autentikasi nyata memerlukan konfigurasi Supabase.');
+        throw new Error('Layanan login belum terhubung. Hubungi admin sekolah.');
       }
 
-      if (recoveryMode) {
-        const { error } = await supabase.auth.updateUser({ password });
-        if (error) throw error;
-        const { error: signOutError } = await supabase.auth.signOut();
-        if (signOutError) {
-          throw new Error(`Kata sandi sudah diperbarui, tetapi sesi belum dapat ditutup: ${signOutError.message}`);
-        }
-        clearPasswordRecovery();
-        setPassword('');
-        setMode('signin');
-        setMessage('Kata sandi diperbarui. Silakan masuk dengan kata sandi baru.');
-        return;
-      }
-
-      if (mode === 'signup') {
-        if (!displayName.trim()) {
-          throw new Error('Masukkan nama lengkap sebelum membuat akun siswa.');
-        }
-        const redirectTo = `${window.location.origin}${window.location.pathname}`;
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: { display_name: displayName.trim() },
-            emailRedirectTo: redirectTo,
-          },
-        });
-        if (error) throw error;
-        if (data.session) {
-          window.location.hash = '#/dashboard';
-          return;
-        }
-        setMessage('Jika alamat email dapat didaftarkan, instruksi konfirmasi akan dikirim. Periksa kotak masuk email Anda.');
-        setMode('signin');
-        setPassword('');
-        return;
-      }
-
-      if (mode === 'reset') {
-        const redirectTo = `${window.location.origin}${window.location.pathname}`;
-        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
-        if (error) throw error;
-        setMessage('Jika akun dengan email tersebut tersedia, instruksi pemulihan akan dikirim.');
-        setMode('signin');
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const normalizedId = userId.trim().toUpperCase();
+      const { data, error } = await supabase.functions.invoke('login-id', {
+        body: { userId: normalizedId, password },
       });
-      if (error) throw error;
-      if (data.user) {
-        await refreshProfile(data.user.id);
-        window.location.hash = '#/dashboard';
+      if (error) throw new Error(data?.error || 'ID Pengguna atau kata sandi salah.');
+      if (data?.error) throw new Error(data.error);
+      if (!data?.access_token || !data?.refresh_token) {
+        throw new Error('Sesi login tidak dapat dibuat. Hubungi admin sekolah.');
       }
+
+      const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      });
+      if (sessionError) throw sessionError;
+      if (sessionData.user) await refreshProfile(sessionData.user.id);
+      window.location.hash = '#/dashboard';
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Terjadi kesalahan. Silakan coba kembali.');
+      setErrorMessage(error instanceof Error ? error.message : 'Login gagal. Silakan coba kembali.');
     } finally {
       setBusy(false);
     }
   }
 
-  const formTitle = recoveryMode
-    ? 'Buat kata sandi baru'
-    : mode === 'signup'
-      ? 'Buat akun siswa'
-      : mode === 'reset'
-        ? 'Pulihkan akses akun'
-        : 'Masuk ke ruang TKJ';
-
-  const passwordLabel = recoveryMode ? 'Kata sandi baru' : 'Kata sandi';
+  const roleLabel = profile?.role === 'admin' ? 'admin' : profile?.role === 'teacher' ? 'guru' : 'siswa';
 
   return (
     <main className="auth-page">
@@ -179,183 +98,87 @@ function LoginPage() {
       <section className="auth-form-panel">
         <div className="auth-form-wrap">
           <a className="auth-mobile-back" href="#beranda"><ArrowLeft size={15} /> Situs TKJ</a>
-          {session && profile && !recoveryMode && !demoMode && (
+          {session && profile && !demoMode && (
             <div className="auth-session-notice" role="status">
-              Anda masuk sebagai {profile.role === 'teacher' ? 'guru' : 'siswa'}.
+              Anda sudah masuk sebagai {roleLabel}.
               <a href="#/dashboard">Buka dashboard <ArrowRight size={14} /></a>
             </div>
           )}
-          {session && profileError && !recoveryMode && (
-            <div className="form-alert is-error" role="alert">{profileError}</div>
-          )}
-          {demoMode && !recoveryMode && (
+          {session && profileError && <div className="form-alert is-error" role="alert">{profileError}</div>}
+          {demoMode && (
             <div className="form-alert is-info" role="status">
-              Anda sedang masuk dengan daftar akun sekolah lokal untuk pengujian awal.
+              Anda sedang memakai mode pratinjau lokal.
               <a href="#/dashboard">Buka dashboard <ArrowRight size={14} /></a>
             </div>
           )}
-          <h2>{formTitle}</h2>
-          <p className="auth-form-intro">
-            {recoveryMode
-              ? 'Gunakan kata sandi baru yang kuat untuk akun Anda.'
-              : mode === 'signup'
-                ? 'Pendaftaran mandiri hanya tersedia untuk siswa. Akun guru disiapkan oleh admin sekolah.'
-                : mode === 'reset'
-                  ? 'Masukkan email akun. Kami akan mengirim tautan pemulihan jika akun tersedia.'
-                  : 'Masuk dengan akun guru atau siswa yang terdaftar.'}
-          </p>
 
-          {configured && !recoveryMode && (
-            <div className="auth-mode-switch" role="tablist" aria-label="Jenis akses akun">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={mode !== 'signup'}
-                className={mode !== 'signup' ? 'is-active' : ''}
-                onClick={() => switchMode('signin')}
-              >
-                Masuk
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={mode === 'signup'}
-                className={mode === 'signup' ? 'is-active' : ''}
-                onClick={() => switchMode('signup')}
-              >
-                Daftar siswa
-              </button>
-            </div>
-          )}
+          <h2>Masuk ke ruang TKJ</h2>
+          <p className="auth-form-intro">
+            Gunakan ID Pengguna dan kata sandi yang diberikan oleh admin sekolah.
+          </p>
 
           {!configured && !demoModeAvailable && (
             <div className="form-alert is-warning" role="status">
-              Supabase belum terhubung. Nyalakan koneksi ke Supabase atau gunakan akun sekolah yang sudah dibuat di Auth.
+              Supabase belum terhubung. Hubungi pengelola situs.
             </div>
           )}
-          {demoModeAvailable && mode === 'signin' && !recoveryMode && (
-            <section className="demo-account-list" aria-labelledby="demo-account-heading">
-              <div className="demo-account-heading">
-                <strong id="demo-account-heading">Akun sekolah siap dipakai</strong>
-                <span>Daftar ini sesuai roster guru dan siswa SMKN 1 Garut untuk pengujian awal.</span>
-              </div>
-              {demoUsers.length === 0 && (
-                <p className="demo-account-empty" role="status">
-                  Daftar akun sekolah belum tersedia. Periksa file <code>src/auth/schoolAccounts.js</code>.
-                </p>
-              )}
-              {demoUsers.map((user) => (
-                <button
-                  className="demo-account-option"
-                  key={user.id}
-                  onClick={() => {
-                    setEmail(user.email);
-                    setPassword(user.password);
-                    setErrorMessage('');
-                    setMessage('');
-                  }}
-                  type="button"
-                >
-                  <span className="demo-account-avatar">
-                    {user.role === 'teacher' ? <Router size={17} /> : <BookOpen size={17} />}
-                  </span>
-                  <span className="demo-account-copy">
-                    <strong>{user.display_name}</strong>
-                    <small>{user.email}</small>
-                  </span>
-                  <span className="demo-account-use">Pilih akun <ArrowRight size={14} /></span>
-                </button>
-              ))}
-            </section>
-          )}
-          {message && <div className="form-alert is-success" role="status">{message}</div>}
           {errorMessage && <div className="form-alert is-error" role="alert">{errorMessage}</div>}
 
           <form className="auth-form" onSubmit={handleSubmit}>
-            {mode === 'signup' && !recoveryMode && (
-              <label>
-                Nama lengkap
-                <span className="auth-input-wrap">
-                  <input
-                    autoComplete="name"
-                    maxLength={80}
-                    name="display-name"
-                    placeholder="Nama yang ditampilkan"
-                    required
-                    value={displayName}
-                    onChange={(event) => setDisplayName(event.target.value)}
-                  />
-                </span>
-              </label>
-            )}
+            <label>
+              ID Pengguna
+              <span className="auth-input-wrap">
+                <UserRound size={17} aria-hidden="true" />
+                <input
+                  autoCapitalize="characters"
+                  autoComplete="username"
+                  maxLength={32}
+                  name="user-id"
+                  pattern="[A-Za-z0-9._-]{3,32}"
+                  placeholder="Contoh: SISWA001"
+                  required
+                  type="text"
+                  value={userId}
+                  onChange={(event) => setUserId(event.target.value.toUpperCase())}
+                />
+              </span>
+            </label>
 
-            {!recoveryMode && (
-              <label>
-                Email
-                <span className="auth-input-wrap">
-                  <Mail size={17} aria-hidden="true" />
-                  <input
-                    autoComplete="email"
-                    name="email"
-                    placeholder="nama@email.com"
-                    required
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
-                </span>
-              </label>
-            )}
+            <label>
+              Kata sandi
+              <span className="auth-input-wrap">
+                <LockKeyhole size={17} aria-hidden="true" />
+                <input
+                  autoComplete={demoModeAvailable ? 'off' : 'current-password'}
+                  minLength={8}
+                  name="password"
+                  placeholder="Minimal 8 karakter"
+                  required
+                  type={passwordVisible ? 'text' : 'password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+                <button
+                  className="password-visibility"
+                  type="button"
+                  aria-label={passwordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                  onClick={() => setPasswordVisible((visible) => !visible)}
+                >
+                  {passwordVisible ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </span>
+            </label>
 
-            {mode !== 'reset' && (
-              <label>
-                {passwordLabel}
-                <span className="auth-input-wrap">
-                  <LockKeyhole size={17} aria-hidden="true" />
-                  <input
-                    autoComplete={demoModeAvailable ? 'off' : recoveryMode ? 'new-password' : mode === 'signup' ? 'new-password' : 'current-password'}
-                    minLength={8}
-                    name="password"
-                    placeholder={recoveryMode || mode === 'signup' ? 'Minimal 8 karakter' : 'Masukkan kata sandi'}
-                    required
-                    type={passwordVisible ? 'text' : 'password'}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                  />
-                  <button
-                    className="password-visibility"
-                    type="button"
-                    aria-label={passwordVisible ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-                    onClick={() => setPasswordVisible((visible) => !visible)}
-                  >
-                    {passwordVisible ? <EyeOff size={17} /> : <Eye size={17} />}
-                  </button>
-                </span>
-              </label>
-            )}
-
-            {configured && mode === 'signin' && !recoveryMode && (
-              <button className="auth-forgot-link" type="button" onClick={() => switchMode('reset')}>
-                Lupa kata sandi?
-              </button>
-            )}
-
-            <button className="auth-submit button button-navy" type="submit" disabled={busy || (!configured && (mode !== 'signin' || !demoModeAvailable))}>
-              {busy ? 'Memproses…' : recoveryMode ? 'Simpan kata sandi baru' : mode === 'signup' ? 'Daftar sebagai siswa' : mode === 'reset' ? 'Kirim tautan pemulihan' : 'Masuk ke dashboard'}
+            <button className="auth-submit button button-navy" type="submit" disabled={busy || (!configured && !demoModeAvailable)}>
+              {busy ? 'Memproses…' : 'Masuk ke dashboard'}
               {!busy && <ArrowRight size={17} aria-hidden="true" />}
             </button>
           </form>
 
-          {mode === 'signup' && (
-            <p className="teacher-account-note">
-              Guru belum punya akses? Minta admin sekolah membuat akun dan memberi peran guru melalui Supabase.
-            </p>
-          )}
-          <p className="auth-footnote">
-            {recoveryMode
-              ? <button type="button" onClick={() => { clearPasswordRecovery(); switchMode('signin'); }}>Kembali ke masuk</button>
-              : 'Akun guru dan siswa membuka dashboard serta fitur yang berbeda sesuai peran.'}
+          <p className="teacher-account-note">
+            Lupa kata sandi? Minta admin sekolah mengatur kata sandi baru dari dashboard admin.
           </p>
+          <p className="auth-footnote">Akses materi, kuis, presensi, dan pengelolaan akun mengikuti peran pengguna.</p>
         </div>
       </section>
     </main>

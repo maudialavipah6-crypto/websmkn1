@@ -35,8 +35,10 @@ on conflict do nothing;
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
+  user_id text unique check (user_id is null or user_id ~ '^[A-Z0-9._-]{3,32}$'),
   display_name text not null,
-  role text not null default 'student' check (role in ('student', 'teacher')),
+  role text not null default 'student' check (role in ('student', 'teacher', 'admin')),
+  active boolean not null default true,
   created_at timestamptz not null default now()
 );
 
@@ -325,7 +327,7 @@ drop policy if exists "Users can see their profile and teachers can see the TKJ 
   on public.profiles;
 create policy "Users can see their profile and teachers can see the TKJ roster"
   on public.profiles for select to authenticated
-  using (id = (select auth.uid()) or (select private.current_role()) = 'teacher');
+  using (id = (select auth.uid()) or (select private.current_role()) in ('teacher', 'admin'));
 
 drop policy if exists "Users can update their own display name"
   on public.profiles;
