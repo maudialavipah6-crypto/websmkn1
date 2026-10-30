@@ -59,7 +59,7 @@ const adminTabs = [
 const newQuestion = () => ({
   prompt: '',
   choices: ['', '', '', ''],
-  correctOption: '0',
+  correctOption: '',
 });
 
 function messageForError(error) {
@@ -93,6 +93,14 @@ function DashboardPage() {
   const [studentAnswers, setStudentAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
   const [attendanceTitle, setAttendanceTitle] = useState('');
+
+  const hasUnsavedWork = Boolean(lessonTitle.trim() || lessonContent.trim() || quizTitle.trim() || quizQuestions.some((question) => question.prompt.trim() || question.choices.some((choice) => choice.trim())) || (studentQuiz && Object.keys(studentAnswers).length));
+  useEffect(() => {
+    if (!hasUnsavedWork) return undefined;
+    const warn = (event) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [hasUnsavedWork]);
 
   const isTeacher = profile?.role === 'teacher';
   const isAdmin = profile?.role === 'admin';
@@ -138,9 +146,9 @@ function DashboardPage() {
       const requests = isTeacher
         ? [
             supabase.from('profiles').select('id, display_name, role').order('display_name'),
-            supabase.from('lessons').select('*').order('created_at', { ascending: false }),
+            supabase.from('lessons').select('*').eq('author_id', profile.id).order('created_at', { ascending: false }),
             supabase.from('lesson_attachments').select('*').order('created_at'),
-            supabase.from('quizzes').select('*').order('created_at', { ascending: false }),
+            supabase.from('quizzes').select('*').eq('author_id', profile.id).order('created_at', { ascending: false }),
             supabase.from('attendance_sessions').select('*').order('created_at', { ascending: false }),
             supabase
               .from('quiz_attempts')
@@ -526,10 +534,10 @@ function DashboardPage() {
     }));
     if (
       !trimmedTitle ||
-      trimmedQuestions.some((question) => !question.prompt || question.choices.some((choice) => !choice))
+      trimmedQuestions.some((question) => !question.prompt || !question.correctOption || question.choices.some((choice) => !choice))
     ) {
       clearFeedback();
-      setErrorMessage('Lengkapi judul kuis, pertanyaan, dan semua pilihan jawaban.');
+      setErrorMessage('Lengkapi judul, pertanyaan, semua pilihan, dan pilih kunci jawaban setiap soal.');
       return;
     }
     setBusyAction('quiz-create');
@@ -588,8 +596,8 @@ function DashboardPage() {
           message += ` Draf kuis ${quizId} masih tersimpan dan perlu dihapus: ${cleanupError.message}`;
         }
       }
-      setErrorMessage(`Kuis belum berhasil diterbitkan: ${message}`);
       await loadData(true);
+      setErrorMessage(`Kuis belum berhasil diterbitkan: ${message}`);
     } finally {
       setBusyAction('');
     }
@@ -735,6 +743,7 @@ function DashboardPage() {
   }
 
   async function signOut() {
+    if (hasUnsavedWork && !window.confirm('Keluar? Perubahan yang belum disimpan akan hilang.')) return;
     clearFeedback();
     const { error } = await signOutUser();
     if (error) {
@@ -781,6 +790,7 @@ function DashboardPage() {
               className={activeTab === id ? 'is-active' : ''}
               key={id}
               onClick={() => {
+                if (studentQuiz && Object.keys(studentAnswers).length && !window.confirm('Tinggalkan kuis? Jawaban yang belum dikirim akan hilang.')) return;
                 setActiveTab(id);
                 setStudentQuiz(null);
                 clearFeedback();
@@ -1272,7 +1282,7 @@ function TeacherLessons({
           )}
           <label className="lesson-publish-toggle">
             <input checked={isPublished} onChange={(event) => onPublishedChange(event.target.checked)} type="checkbox" />
-            <span><strong>Terbitkan untuk siswa</strong><small>Jika tidak dicentang, materi hanya tersimpan sebagai draf.</small></span>
+            <span><strong>Terbitkan sebagai materi publik</strong><small>Materi terbit dapat dibaca tanpa login. Matikan untuk menyimpan sebagai draf.</small></span>
           </label>
           <div className="lesson-form-actions">
             <button className="dashboard-primary" disabled={lessonBusy} type="submit">
@@ -1347,7 +1357,7 @@ function TeacherQuizzes({
     <div className="workspace-grid">
       <section className="dashboard-panel workspace-form-panel">
         <PanelHeading title="Buat kuis TKJ" />
-        <p className="workspace-description">Kunci jawaban disimpan terpisah dari soal siswa. Nilai dihitung database saat jawaban dikirim.</p>
+        <p className="workspace-description">Buat 3–12 soal dengan empat pilihan jawaban. Pilih satu kunci jawaban untuk setiap soal.</p>
         {demoMode ? (
           <DemoReadOnlyNotice />
         ) : (
@@ -1360,8 +1370,9 @@ function TeacherQuizzes({
           </label>
           {questions.map((question, questionIndex) => (
             <fieldset className="question-editor" key={questionIndex}>
+              <legend className="sr-only">Soal {questionIndex + 1}</legend>
               <div className="question-editor-heading">
-                <legend><span className="question-number">Soal {String(questionIndex + 1).padStart(2, '0')}</span></legend>
+                <span className="question-number" aria-hidden="true">Soal {String(questionIndex + 1).padStart(2, '0')}</span>
                 {questions.length > 3 && (
                   <button className="question-remove" type="button" onClick={() => onRemoveQuestion(questionIndex)}>Hapus soal</button>
                 )}
@@ -1378,7 +1389,7 @@ function TeacherQuizzes({
               />
               <div className="question-choice-list">
                 {question.choices.map((choice, choiceIndex) => (
-                  <label className="question-choice" key={choiceIndex}>
+                  <div className="question-choice" key={choiceIndex}>
                     <input
                       aria-label={`Tandai pilihan ${choiceIndex + 1} sebagai jawaban benar untuk soal ${questionIndex + 1}`}
                       checked={question.correctOption === String(choiceIndex)}
@@ -1394,7 +1405,7 @@ function TeacherQuizzes({
                       onChange={(event) => onQuestionChange(questionIndex, 'choices', event.target.value, choiceIndex)}
                       placeholder={`Pilihan ${String.fromCharCode(65 + choiceIndex)}`}
                     />
-                  </label>
+                  </div>
                 ))}
               </div>
               <small>Pilih radio untuk menandai kunci jawaban soal ini.</small>
@@ -1595,7 +1606,7 @@ function StudentQuizzes({
             ))}
           </div>
           <div className="student-quiz-submit">
-            <span>Hanya satu percobaan. Pastikan semua jawaban sudah benar.</span>
+            <span>Terjawab {Object.keys(selectedAnswers).length} dari {selectedQuiz.questions.length} soal. Hanya satu percobaan.</span>
             <button className="dashboard-primary" disabled={!answered || busyAction === 'quiz-submit'} type="submit">
               {busyAction === 'quiz-submit' ? 'Mengirim jawaban…' : 'Kirim jawaban'} <Send size={15} />
             </button>

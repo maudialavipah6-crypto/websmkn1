@@ -51,7 +51,7 @@ set search_path = ''
 as $$
   select p.role
   from public.profiles as p
-  where p.id = (select auth.uid())
+  where p.id = (select auth.uid()) and p.active
 $$;
 
 revoke all on function private.current_role() from public, anon;
@@ -233,7 +233,7 @@ begin
   where question.quiz_id = new.quiz_id;
 
   if total_questions = 0
-    or pg_catalog.jsonb_object_length(new.answers) <> total_questions
+    or (select count(*) from pg_catalog.jsonb_object_keys(new.answers)) <> total_questions
   then
     raise exception 'Submit exactly one answer for each quiz question.';
   end if;

@@ -131,3 +131,9 @@ npm run dev
 Uji satu akun guru dan satu akun siswa: terbitkan materi/kuis dan buka sesi presensi sebagai guru, lalu pastikan akun siswa dapat melihat konten yang sama, mengirim jawaban, dan mencatat kehadiran. Hasil serta presensi tiap siswa hanya terlihat oleh siswa terkait dan guru yang memiliki sesi/kuis.
 
 Untuk menguji CMS, buat materi draf, tambahkan format dan gambar/PDF, simpan, lalu edit dan terbitkan. Pastikan siswa tidak dapat melihat draf, dapat melihat materi terbit, gambar, serta membuka lampiran; setelah materi ditarik atau dihapus, tautan penyimpanannya tidak lagi diberikan oleh portal.
+
+## Revisi audit LMS
+
+Setelah merge, jalankan `supabase/audit-fixes.sql` di SQL Editor pada proyek yang sudah memiliki schema dan migrasi ID pengguna. Migrasi memperbaiki penghitungan jawaban dan pemeriksaan role untuk akun aktif tanpa menghapus data.
+
+Deploy ulang `supabase functions deploy admin-users` untuk perlindungan admin yang sedang login. Frontend mengikuti deployment Vercel. Uji pengiriman kuis dan penonaktifan akun di lingkungan pengujian sebelum digunakan kelas.

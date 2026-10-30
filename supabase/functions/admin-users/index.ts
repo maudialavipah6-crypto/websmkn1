@@ -44,6 +44,7 @@ Deno.serve(async (request) => {
     }
     if (!body.id) return json({ error: 'Akun tidak ditemukan.' }, 400);
     if (action === 'update') {
+      if (body.id === caller.user.id && (body.role !== 'admin' || body.active !== true)) return json({ error: 'Admin tidak dapat menonaktifkan atau menurunkan perannya sendiri.' }, 400);
       if (!validId(userId) || !displayName || !['student', 'teacher', 'admin'].includes(body.role)) return json({ error: 'Data akun tidak valid.' }, 400);
       const { error } = await admin.from('profiles').update({ user_id: userId, display_name: displayName, role: body.role, active: Boolean(body.active) }).eq('id', body.id);
       if (error) throw error;
