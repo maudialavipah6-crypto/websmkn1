@@ -783,7 +783,6 @@ function DashboardPage() {
           <span><small>Program keahlian</small><strong>Teknik Komputer dan Jaringan</strong></span>
         </div>
         <nav className="dashboard-nav" aria-label="Navigasi dashboard">
-          <span className="sidebar-caption">RUANG KERJA</span>
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
               aria-current={activeTab === id ? 'page' : undefined}
@@ -1390,13 +1389,15 @@ function TeacherQuizzes({
               <div className="question-choice-list">
                 {question.choices.map((choice, choiceIndex) => (
                   <div className="question-choice" key={choiceIndex}>
-                    <input
-                      aria-label={`Tandai pilihan ${choiceIndex + 1} sebagai jawaban benar untuk soal ${questionIndex + 1}`}
-                      checked={question.correctOption === String(choiceIndex)}
-                      name={`correct-${questionIndex}`}
-                      onChange={() => onQuestionChange(questionIndex, 'correctOption', String(choiceIndex))}
-                      type="radio"
-                    />
+                    <label>
+                      <input
+                        aria-label={`Tandai pilihan ${choiceIndex + 1} sebagai jawaban benar untuk soal ${questionIndex + 1}`}
+                        checked={question.correctOption === String(choiceIndex)}
+                        name={`correct-${questionIndex}`}
+                        onChange={() => onQuestionChange(questionIndex, 'correctOption', String(choiceIndex))}
+                        type="radio"
+                      />
+                    </label>
                     <input
                       aria-label={`Pilihan jawaban ${choiceIndex + 1}`}
                       maxLength={300}
