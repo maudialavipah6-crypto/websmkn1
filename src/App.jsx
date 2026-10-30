@@ -215,13 +215,13 @@ function App() {
 
         <section className="section purpose-section" id="tujuan">
           <div className="section-heading">
-            <div><span className="section-eyebrow">TENTANG WEB INI</span><h2>Belajar TKJ, dari materi sampai evaluasi.</h2></div>
+            <div><h2>Belajar TKJ, dari materi sampai evaluasi.</h2></div>
             <p className="section-intro">Web pembelajaran ini membantu siswa mengakses materi TKJ dan mengikuti aktivitas kelas. Guru dapat menerbitkan materi serta mengelola kuis dan presensi dari ruang kerja mereka.</p>
           </div>
           <div className="purpose-grid">
-            <div><span>01 / AKSES</span><h3>Materi terbuka</h3><p>Modul yang telah diterbitkan bisa dibaca siapa saja tanpa akun.</p></div>
-            <div><span>02 / LATIHAN</span><h3>Evaluasi terarah</h3><p>Siswa yang masuk dapat mengerjakan kuis dan melihat hasilnya.</p></div>
-            <div><span>03 / KELAS</span><h3>Aktivitas tercatat</h3><p>Guru mengelola materi dan sesi presensi melalui dashboard.</p></div>
+            <div><h3>Materi terbuka</h3><p>Modul yang telah diterbitkan bisa dibaca siapa saja tanpa akun.</p></div>
+            <div><h3>Evaluasi terarah</h3><p>Siswa yang masuk dapat mengerjakan kuis dan melihat hasilnya.</p></div>
+            <div><h3>Aktivitas tercatat</h3><p>Guru mengelola materi dan sesi presensi melalui dashboard.</p></div>
           </div>
         </section>
 
@@ -247,7 +247,7 @@ function App() {
 
         <section className="section learning-section" id="pembelajaran">
           <div className="section-heading learning-heading">
-            <div><span className="section-eyebrow">PERPUSTAKAAN TKJ</span><h2>Materi yang bisa dibaca kapan saja.</h2></div>
+            <div><h2>Materi yang bisa dibaca kapan saja.</h2></div>
             <p className="section-intro">
               Baca modul yang diterbitkan guru tanpa login. Untuk mengerjakan kuis dan mencatat presensi, masuk ke dashboard siswa.
             </p>
@@ -256,7 +256,7 @@ function App() {
           <div className="learning-footnote">Kuis dan presensi khusus akun siswa. <a href={accountHref}>{accountLabel} <ArrowRight size={15} /></a></div>
         </section>
 
-        <section className="section school-section" id="profil-sekolah"><div className="section-heading"><div><span className="section-eyebrow">PROFIL SEKOLAH</span><h2>Kenali SMKN 1 Garut.</h2></div><p className="section-intro">Lihat identitas, sejarah singkat, program keahlian, dan informasi resmi sekolah.</p></div><a className="inline-link" href="#/profil-sekolah">Lihat profil lengkap <ArrowRight size={16}/></a></section>
+        <section className="section school-section" id="profil-sekolah"><div className="section-heading"><div><h2>Kenali SMKN 1 Garut.</h2></div><p className="section-intro">Lihat identitas, sejarah singkat, program keahlian, dan informasi resmi sekolah.</p></div><a className="inline-link" href="#/profil-sekolah">Lihat profil lengkap <ArrowRight size={16}/></a></section>
 
         <section className="section vision-section vision-profile-section" id="visi-misi">
           <div className="vision-copy">
@@ -274,7 +274,7 @@ function App() {
         </section>
 
         <section className="section creators-section" id="pembuat">
-          <div className="section-heading"><div><span className="section-eyebrow">DI BALIK WEB</span><h2>Profil pembuat.</h2></div><p className="section-intro">Lima anggota dari Program Studi Sistem Informasi, Institut Pendidikan Indonesia Garut. Profil anggota tim pengembang web pembelajaran.</p></div>
+          <div className="section-heading"><div><h2>Profil pembuat.</h2></div><p className="section-intro">Lima anggota dari Program Studi Sistem Informasi, Institut Pendidikan Indonesia Garut. Profil anggota tim pengembang web pembelajaran.</p></div>
           <div className="creator-grid">{creators.map((creator) => <article className="creator-card" key={creator.id}>
             <div className="creator-photo">{creator.photo ? <img src={creator.photo} alt={`Foto ${creator.name}`} loading="lazy" /> : <span aria-label="Foto belum tersedia">FOTO<br />ANGGOTA {String(creator.id).padStart(2, '0')}</span>}</div>
             <div className="creator-info"><small>ANGGOTA {String(creator.id).padStart(2, '0')}</small><h3>{creator.name}</h3><p>{creator.nim}</p><p>Sistem Informasi<br />Institut Pendidikan Indonesia Garut</p></div>

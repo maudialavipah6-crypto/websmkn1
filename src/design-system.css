@@ -1,0 +1,173 @@
+/* Shared UI: typography, controls, reading surfaces, and repeated dashboard patterns.
+   Page composition lives in styles.css; viewport changes live in responsive.css. */
+
+::selection { color: var(--navy); background: var(--cyan-soft); }
+:where(input, textarea, [contenteditable]) { caret-color: var(--electric-dark); }
+:where(a) { text-underline-offset: .2em; }
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.auth-page button:focus-visible, .dashboard-layout button:focus-visible,
+.dashboard-layout a:focus-visible, .auth-mode-switch button:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 3px;
+}
+:where(button, input, select, textarea):disabled { cursor: not-allowed; opacity: .6; }
+:where(h1, h2, h3) { text-wrap: balance; }
+:where(.nav-count, .metric-item, .admin-account-stats, .score-badge, .account-filter-count, .resource-results) {
+  font-variant-numeric: tabular-nums;
+}
+.mobile-drawer { scrollbar-width: thin; scrollbar-color: var(--border-control) var(--white); }
+
+/* Type roles stay the same across teacher, student, and admin views. */
+.dashboard-layout { font-size: var(--text-base); line-height: var(--leading-body); }
+.dashboard-welcome h1 { font-size: var(--text-title); font-weight: var(--weight-bold); line-height: var(--leading-heading); letter-spacing: -.025em; }
+.panel-heading-row h2, .student-resource-card > h2, .lesson-downloads h3 {
+  font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: 1.4; letter-spacing: -.015em;
+}
+.dashboard-welcome p, .workspace-description, .student-resource-card > p,
+.owned-resource > p, .dashboard-empty p, .roster-panel > p, .admin-account-empty,
+.lesson-reader-summary, .rich-text-loading {
+  color: var(--muted); font-size: var(--text-sm); line-height: var(--leading-body); max-width: 70ch;
+}
+.dashboard-welcome p { margin-top: var(--space-2); }
+.workspace-form > label, .admin-account-form label, .lesson-editor-field, .account-filters label {
+  display: grid; gap: var(--space-2); color: var(--ink); font-size: var(--text-sm); font-weight: var(--weight-semibold); line-height: 1.5;
+}
+.owned-resource-heading strong, .admin-account-identity strong, .compact-copy strong, .dashboard-empty strong {
+  color: var(--ink); font-size: var(--text-base); font-weight: var(--weight-semibold); line-height: 1.4; white-space: normal; overflow-wrap: anywhere;
+}
+.owned-resource-heading small, .admin-account-identity small, .compact-copy small,
+.dashboard-brand small, .dashboard-user small, .rich-text-footer, .lesson-editor-field > small,
+.owned-attachment-count, .lesson-publish-toggle small, .lesson-reader-heading p,
+.resource-results small, .question-editor > small {
+  color: var(--muted); font-size: var(--text-xs); font-weight: var(--weight-regular); line-height: 1.6;
+}
+.dashboard-brand strong, .dashboard-user strong, .lesson-publish-toggle strong { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.dashboard-breadcrumb, .roster-summary > span, .resource-results > span, .lesson-downloads li,
+.lesson-downloads p, .demo-readonly-notice, .demo-action-unavailable, .attendance-safety-note {
+  font-size: var(--text-sm); line-height: var(--leading-body);
+}
+.state-badge, .score-badge, .admin-role-badge, .admin-status-badge { font-size: var(--text-xs); font-weight: var(--weight-semibold); line-height: 1.5; }
+.metric-item small, .admin-account-stats span { color: var(--muted); font-size: var(--text-xs); white-space: normal; }
+.metric-item strong, .admin-account-stats strong { font-size: var(--text-xl); font-weight: var(--weight-bold); line-height: 1.3; }
+
+/* Text fields exclude radios, checkboxes, and file pickers. */
+.workspace-form input:where(:not([type=radio], [type=checkbox], [type=file])),
+.workspace-form textarea, .admin-account-form input:not([type=checkbox]),
+.admin-account-form select, .account-filters input, .account-filters select {
+  width: 100%; min-width: 0; min-height: var(--control-height); padding: 10px 12px;
+  border: 1px solid var(--border-control); border-radius: var(--radius-control);
+  color: var(--ink); background: var(--white); font: inherit;
+  font-size: var(--text-base); font-weight: var(--weight-regular); line-height: 1.5;
+  transition: border-color var(--motion-fast) ease;
+}
+.workspace-form textarea { min-height: 112px; resize: vertical; }
+.auth-form input { font-size: var(--text-base); }
+.auth-form > label { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.auth-input-wrap { border-color: var(--border-control); border-radius: var(--radius-control); }
+.auth-input-wrap:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; box-shadow: none; }
+.password-visibility { min-width: var(--control-height); min-height: var(--control-height); }
+.workspace-form input::placeholder, .workspace-form textarea::placeholder,
+.admin-account-form input::placeholder, .account-filters input::placeholder, .auth-form input::placeholder,
+.rich-text-content p.is-editor-empty:first-child::before {
+  color: var(--muted); font-weight: var(--weight-regular); opacity: 1;
+}
+.workspace-form input:focus, .workspace-form textarea:focus,
+.admin-account-form input:focus, .admin-account-form select:focus,
+.account-filters input:focus, .account-filters select:focus {
+  outline: 2px solid var(--focus); outline-offset: 2px; box-shadow: none;
+}
+.workspace-form input[type=checkbox], .workspace-form input[type=radio], .admin-active-toggle input {
+  width: 18px; height: 18px; min-width: 18px; min-height: 18px; flex: 0 0 auto;
+  margin: 0; padding: 0; accent-color: var(--electric-dark);
+}
+
+/* Shared control geometry; color communicates action priority. */
+.dashboard-primary, .student-resource-card > button, .resource-actions button,
+.refresh-button, .lesson-cancel-button, .add-question-button, .question-remove,
+.back-to-list, .public-back, .school-profile-back, .panel-action,
+.admin-account-actions button, .rich-text-attachment-button {
+  display: inline-flex; min-height: var(--control-height); align-items: center; justify-content: center;
+  gap: var(--space-2); padding: 10px 14px; max-width: 100%;
+  border: 1px solid var(--border-control); border-radius: var(--radius-control);
+  color: var(--ink); background: var(--white); font: inherit;
+  font-size: var(--text-sm); font-weight: var(--weight-semibold); line-height: 1.5;
+  text-align: center; text-decoration: none; cursor: pointer;
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease;
+}
+.dashboard-primary, .student-resource-card > button { border-color: var(--action); color: var(--white); background: var(--action); }
+.dashboard-primary:hover:not(:disabled), .student-resource-card > button:hover:not(:disabled) {
+  background: var(--action-hover); border-color: var(--action-hover); box-shadow: none; transform: none;
+}
+.resource-actions button:hover:not(:disabled), .refresh-button:hover:not(:disabled),
+.lesson-cancel-button:hover:not(:disabled), .add-question-button:hover:not(:disabled),
+.back-to-list:hover, .public-back:hover, .school-profile-back:hover, .panel-action:hover,
+.admin-account-actions button:hover:not(:disabled), .rich-text-attachment-button:hover {
+  color: var(--electric-dark); background: var(--action-soft); border-color: var(--electric-dark); text-decoration: none;
+}
+.question-remove, .resource-actions button.is-danger { color: var(--danger); }
+.question-remove:hover:not(:disabled), .resource-actions button.is-danger:hover:not(:disabled) {
+  color: var(--danger); background: var(--danger-soft); border-color: var(--danger);
+}
+.panel-action { padding-inline: var(--space-2); border-color: transparent; color: var(--electric-dark); background: transparent; }
+.admin-account-actions button { min-width: var(--control-height); padding: 10px; }
+.button, .auth-submit { min-height: var(--control-height); font-weight: var(--weight-semibold); font-size: var(--text-sm); }
+.dashboard-nav > button, .sidebar-bottom a, .sidebar-bottom button {
+  min-height: var(--control-height); font-size: var(--text-sm); font-weight: var(--weight-medium);
+}
+.dashboard-nav > button.is-active { font-weight: var(--weight-semibold); }
+.back-to-list, .public-back, .school-profile-back, .add-question-button { width: fit-content; }
+.back-to-list { margin-bottom: var(--space-5); }
+.resource-actions { gap: var(--space-2); }
+.student-resource-card > .button-success { color: var(--success); background: var(--success-soft); border-color: var(--success); }
+.student-resource-card > .button-success:hover:not(:disabled) { color: var(--success); background: #e4f5eb; border-color: var(--success); }
+
+/* One surface for the task; repeated items use dividers instead of nested boxes. */
+.dashboard-panel, .student-resource-card { padding: var(--space-5); border-radius: var(--radius-panel); box-shadow: none; }
+.workspace-form, .admin-account-form, .quiz-author-form { gap: var(--space-4); }
+.panel-heading-row { gap: var(--space-3); flex-wrap: wrap; }
+.owned-resource-list, .admin-account-list { gap: 0; }
+.owned-resource { padding: var(--space-4) 0; border: 0; border-radius: 0; background: transparent; }
+.owned-resource + .owned-resource { border-top: 1px solid var(--line); }
+.owned-resource-heading { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; }
+.owned-resource-heading strong { overflow: visible; text-overflow: clip; }
+.owned-resource > p { margin-top: var(--space-3); }
+.admin-account-row { padding: var(--space-4) 0; border: 0; border-radius: 0; border-bottom: 1px solid var(--line); }
+.admin-account-row.is-inactive { opacity: 1; background: var(--surface-subtle); }
+.admin-account-row:last-child { border-bottom: 0; }
+
+/* Question headers are inside the fieldset; its accessible legend stays hidden. */
+.question-editor { display: grid; min-width: 0; gap: var(--space-3); margin: 0; padding: var(--space-4) 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
+.question-editor-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: var(--control-height); }
+.question-number { color: var(--ink); font-size: var(--text-base); font-weight: var(--weight-semibold); }
+.question-choice-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+.question-editor .question-choice { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; min-width: 0; padding: 0; border: 1px solid var(--border-control); border-radius: var(--radius-control); background: var(--white); }
+.question-choice label { display: grid; min-height: var(--control-height); place-items: center; cursor: pointer; }
+.question-editor .question-choice input[type=radio] { margin: 0; padding: 0; box-shadow: none; }
+.question-editor .question-choice input:not([type=radio]) { min-height: var(--control-height); border: 0; border-radius: 0 var(--radius-control) var(--radius-control) 0; background: transparent; }
+.question-choice:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+.question-choice:has(input:checked) { border-color: var(--electric-dark); background: var(--action-soft); }
+.question-choice input:focus { outline: 0; }
+
+/* Reading and editing share a legible measure. */
+.lesson-reader-content, .rich-text-content {
+  color: var(--ink); font-size: var(--text-base); font-weight: var(--weight-regular); line-height: 1.75; max-width: 70ch;
+}
+.lesson-reader-content { width: 100%; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.lesson-reader-content:empty { display: none; }
+.rich-text-editor { border-color: var(--border-control); border-radius: var(--radius-control); }
+.rich-text-toolbar button, .rich-text-upload { width: var(--control-height); height: var(--control-height); border-radius: var(--radius-control); }
+.rich-text-editor:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; box-shadow: none; }
+.lesson-reader-content blockquote, .rich-text-content blockquote { border-left-width: 1px; }
+.lesson-downloads a, .public-downloads a { display: inline-flex; align-items: center; min-height: var(--control-height); }
+.workspace-form > .lesson-publish-toggle { display: flex; align-items: center; }
+.lesson-publish-toggle, .admin-active-toggle { min-height: var(--control-height); }
+.staged-asset-list li > button { min-height: var(--control-height); }
+
+/* Account controls use the same field primitives as lesson and quiz forms. */
+.account-filters { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); align-items: end; gap: var(--space-3); margin-block: var(--space-4); }
+.account-filter-count { grid-column: 1 / -1; color: var(--muted); font-size: var(--text-xs); }
+.admin-account-row { grid-template-columns: auto minmax(0, 1fr) auto auto auto; }
+.admin-status-badge { display: inline-flex; }
+.sidebar-program small, .sidebar-program strong { display: block; }
