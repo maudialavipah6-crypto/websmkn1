@@ -1,0 +1,66 @@
+/* Shared navigation and reading layouts, loaded after the base theme. */
+.site-navigation { min-width: 0; }
+.drawer-account-link { display: none; }
+.drawer-trigger, .drawer-close {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; min-width: 44px; padding: 10px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: white; color: var(--ink); cursor: pointer; font: inherit;
+}
+.mobile-drawer {
+  position: fixed; inset: 0 auto 0 0; margin: 0;
+  width: min(340px, 88vw); max-width: none; height: 100dvh; max-height: none;
+  padding: 0; border: 0; background: white; color: var(--ink);
+  box-shadow: 12px 0 48px #071b3533; overflow-y: auto;
+}
+.mobile-drawer::backdrop { background: #071b3599; }
+.drawer-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+.drawer-content { padding: 18px; }
+.mobile-drawer .dashboard-sidebar { position: static; height: auto; min-height: 0; border: 0; }
+.mobile-drawer .dashboard-nav { display: flex; flex-direction: column; overflow: visible; gap: 8px; padding-block: 20px; }
+.mobile-drawer .dashboard-nav > button { width: 100%; min-height: 48px; flex: none; justify-content: flex-start; font-size: .9rem; }
+.mobile-drawer .sidebar-bottom { display: flex; flex-direction: column; align-items: stretch; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+.mobile-drawer .sidebar-bottom a, .mobile-drawer .sidebar-bottom button { min-height: 48px; font-size: .85rem; }
+.mobile-drawer .nav { display: flex; flex-direction: column; align-items: stretch; border: 0; gap: 6px; padding: 0; }
+.mobile-drawer .nav a { display: flex; align-items: center; min-height: 48px; padding: 12px; font-size: .95rem; border-radius: 8px; }
+.mobile-drawer .nav a:hover { background: #edf3fb; }
+.mobile-drawer .drawer-account-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px; margin-top: 20px; border-radius: 8px; background: var(--navy); color: white; }
+.back-to-list, .public-back, .school-profile-back {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: fit-content; max-width: 100%; min-height: 44px; padding: 10px 14px;
+  border: 1px solid #cbd8e7; border-radius: 9px; background: #f5f8fc;
+  color: #244a78; font: inherit; font-size: .875rem; font-weight: 700;
+  text-align: left; text-decoration: none; cursor: pointer;
+}
+.back-to-list:hover, .public-back:hover, .school-profile-back:hover { background: #e8f0fb; text-decoration: none; }
+.back-to-list { margin-bottom: 20px; }
+.lesson-reader-content { min-height: 0; border: 0; padding: 0; font-size: .95rem; }
+.lesson-reader-content:empty { display: none; }
+.lesson-reader > h2, .lesson-reader-summary, .public-reader h3 { overflow-wrap: anywhere; }
+.lesson-reader-summary { color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+.lesson-reader-content img, .rich-text-content img { max-width: 100%; height: auto; }
+.lesson-reader-content pre { max-width: 100%; overflow-x: auto; }
+.lesson-downloads a, .public-downloads a { overflow-wrap: anywhere; min-width: 0; }
+.lesson-downloads li, .public-downloads li { min-height: 44px; }
+.lesson-downloads svg, .public-downloads svg { flex-shrink: 0; }
+.dashboard-main, .dashboard-panel, .workspace-grid > *, .school-profile-block > *, .admin-account-identity { min-width: 0; }
+.dashboard-panel h2, .admin-account-identity strong, .school-contact-list span { overflow-wrap: anywhere; }
+.public-state { flex-wrap: wrap; }
+@media (max-width: 800px) {
+  .topbar > .drawer-trigger { grid-column: 2; grid-row: 1; }
+  .dashboard-layout > .drawer-trigger { align-self: flex-start; margin: 12px 16px; font-size: .875rem; }
+  .dashboard-topbar { gap: 12px; flex-wrap: wrap; }
+  .dashboard-content { padding: 24px 16px 40px; }
+  .auth-form input, .workspace-form input, .workspace-form textarea, .admin-account-form input, .admin-account-form select { font-size: 16px; }
+  .workspace-actions, .panel-heading-row, .lesson-form-actions { flex-wrap: wrap; gap: 10px; }
+  .dashboard-panel { padding: 18px; }
+  .lesson-reader-content { padding: 0; }
+  .public-reader { padding: 20px 16px; }
+  .admin-account-actions button { min-width: 44px; min-height: 44px; }
+}
+@media (max-width: 400px) {
+  .drawer-trigger span { display: none; }
+  .school-profile-facts { grid-template-columns: 1fr; }
+  .admin-account-row { gap: 8px; padding: 10px 8px; }
+  .dashboard-content { padding-inline: 12px; }
+}

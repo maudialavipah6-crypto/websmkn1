@@ -14,7 +14,7 @@ const programs = [
 ];
 
 export default function SchoolProfilePage() {
-  return <div className="page-shell"><header className="topbar"><a className="brand-wrap" href="#beranda"><img className="brand-logo" src="/LOGO_SMKN1_GARUT.jpeg" alt=""/><span className="brand-copy"><strong>SMKN 1 Garut</strong><span>Profil Sekolah</span></span></a><a className="header-cta" href="#/login">Login guru / siswa <ArrowUpRight size={16}/></a></header><main className="school-profile-page">
+  return <div className="page-shell"><header className="topbar"><a className="brand-wrap" href="#beranda"><img className="brand-logo" src="/LOGO_SMKN1_GARUT.jpeg" alt=""/><span className="brand-copy"><strong>SMKN 1 Garut</strong><span>Profil Sekolah</span></span></a><a className="header-cta" href="#/login">Login guru / siswa <ArrowUpRight size={16}/></a><ResponsiveSidebar className="site-navigation" label="SMKN 1 Garut"><nav className="nav" aria-label="Navigasi sekolah"><a href="#beranda">Beranda</a><a href="#pembelajaran">Materi TKJ</a><a href="#/dashboard">Dashboard</a></nav></ResponsiveSidebar></header><main className="school-profile-page">
     <a className="school-profile-back" href="#beranda"><ArrowLeft size={16}/> Kembali ke beranda</a>
     <header className="school-profile-hero">
       <span>PROFIL SEKOLAH · GARUT</span><h1>SMK Negeri 1 Garut</h1>
@@ -27,3 +27,4 @@ export default function SchoolProfilePage() {
     <footer className="school-profile-source">Sumber: <a href="https://referensi.data.kemendikdasmen.go.id/pendidikan/npsn/20209201" target="_blank" rel="noreferrer">Data Pendidikan Kemendikdasmen</a> dan <a href="https://smknegeri1garut.sch.id/" target="_blank" rel="noreferrer">situs resmi SMKN 1 Garut</a>. Informasi akreditasi mengacu pada data tahun 2022.</footer>
   </main><footer className="school-profile-footer"><a href="#beranda">Kembali ke beranda</a><span>SMKN 1 Garut · Kabupaten Garut</span></footer></div>;
 }
+import ResponsiveSidebar from '../components/ResponsiveSidebar';
