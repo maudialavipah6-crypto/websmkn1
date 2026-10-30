@@ -98,3 +98,25 @@
   .admin-account-row { gap: 8px; padding: 10px 8px; }
   .dashboard-content { padding-inline: 12px; }
 }
+
+/* Quiz authoring: consistent fieldset legend and clear add-question action. */
+.quiz-author-form { gap: 14px; }
+.question-editor { position: relative; gap: 12px; margin: 0; padding: 14px; border-color: #dce3eb; border-radius: 10px; background: #fbfcfe; }
+.question-editor legend { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0; color: #293f56; font-size: .8125rem; font-weight: 600; }
+.question-editor .question-number { display: inline-flex; min-height: 28px; align-items: center; }
+.question-editor .question-remove { min-height: 36px; padding: 6px 10px; border: 1px solid #ead6d6; border-radius: 7px; background: #fff; color: #9a4141; font: inherit; font-size: .75rem; font-weight: 500; }
+.question-editor > textarea { min-height: 104px; resize: vertical; }
+.question-editor .question-choice-list { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.question-editor .question-choice { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 8px; min-height: 48px; padding: 6px 10px; border-color: #e0e6ed; border-radius: 8px; }
+.question-editor .question-choice input[type="radio"] { width: 18px; height: 18px; margin: 0; }
+.question-editor .question-choice input:not([type="radio"]) { min-width: 0; min-height: 44px; padding: 9px 10px; border: 1px solid #d5dde6; border-radius: 8px; font-size: .9375rem; font-weight: 400; }
+.question-editor > small { color: #647386; font-size: .75rem; line-height: 1.5; }
+.add-question-button { display: inline-flex; width: fit-content; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border: 1px solid #c8d7eb; border-radius: 8px; background: #f5f8fc; color: #2457a3; font: inherit; font-size: .875rem; font-weight: 600; cursor: pointer; }
+.add-question-button:hover { border-color: #9bb8df; background: #edf3fb; }
+.quiz-author-form > .dashboard-primary { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border-radius: 8px; font-size: .875rem; font-weight: 600; }
+@media (max-width: 800px) {
+  .quiz-author-form { gap: 12px; }
+  .question-editor { padding: 12px; }
+  .question-editor .question-choice { grid-template-columns: 20px minmax(0,1fr); }
+  .add-question-button { width: 100%; }
+}
