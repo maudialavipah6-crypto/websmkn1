@@ -1360,12 +1360,12 @@ function TeacherQuizzes({
           </label>
           {questions.map((question, questionIndex) => (
             <fieldset className="question-editor" key={questionIndex}>
-              <legend>
-                <span className="question-number">Soal {String(questionIndex + 1).padStart(2, '0')}</span>
+              <div className="question-editor-heading">
+                <legend><span className="question-number">Soal {String(questionIndex + 1).padStart(2, '0')}</span></legend>
                 {questions.length > 3 && (
-                  <button className="question-remove" type="button" onClick={() => onRemoveQuestion(questionIndex)}>Hapus</button>
+                  <button className="question-remove" type="button" onClick={() => onRemoveQuestion(questionIndex)}>Hapus soal</button>
                 )}
-              </legend>
+              </div>
               <label className="sr-only" htmlFor={`question-prompt-${questionIndex}`}>Teks soal {questionIndex + 1}</label>
               <textarea
                 id={`question-prompt-${questionIndex}`}

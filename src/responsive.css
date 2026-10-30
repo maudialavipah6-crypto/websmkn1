@@ -101,9 +101,10 @@
 
 /* Quiz authoring: consistent fieldset legend and clear add-question action. */
 .quiz-author-form { gap: 14px; }
-.question-editor { position: relative; gap: 12px; margin: 0; padding: 14px; border-color: #dce3eb; border-radius: 10px; background: #fbfcfe; }
-.question-editor legend { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0; color: #293f56; font-size: .8125rem; font-weight: 600; }
-.question-editor .question-number { display: inline-flex; min-height: 28px; align-items: center; }
+.question-editor { position: relative; gap: 12px; margin: 0; padding: 12px; border-color: #dce3eb; border-radius: 10px; background: #fbfcfe; }
+.question-editor-heading { display: flex; min-height: 40px; align-items: center; justify-content: space-between; gap: 8px; }
+.question-editor-heading legend { display: block; float: none; width: auto; padding: 0; color: #293f56; font-size: .875rem; font-weight: 600; }
+.question-editor .question-number { display: inline-flex; min-height: 32px; align-items: center; }
 .question-editor .question-remove { min-height: 36px; padding: 6px 10px; border: 1px solid #ead6d6; border-radius: 7px; background: #fff; color: #9a4141; font: inherit; font-size: .75rem; font-weight: 500; }
 .question-editor > textarea { min-height: 104px; resize: vertical; }
 .question-editor .question-choice-list { grid-template-columns: minmax(0, 1fr); gap: 8px; }
@@ -116,7 +117,7 @@
 .quiz-author-form > .dashboard-primary { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border-radius: 8px; font-size: .875rem; font-weight: 600; }
 @media (max-width: 800px) {
   .quiz-author-form { gap: 12px; }
-  .question-editor { padding: 12px; }
+  .question-editor { padding: 10px; gap: 10px; }
   .question-editor .question-choice { grid-template-columns: 20px minmax(0,1fr); }
   .add-question-button { width: 100%; }
 }
