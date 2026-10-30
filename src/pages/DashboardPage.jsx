@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 import AdminAccounts from '../components/AdminAccounts';
+import ResponsiveSidebar from '../components/ResponsiveSidebar';
 import { getDemoDashboardData } from '../auth/demoDashboardData';
 import { prepareLessonHtml, renderLessonHtml } from '../lib/lessonContent';
 
@@ -762,7 +763,7 @@ function DashboardPage() {
 
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
+      <ResponsiveSidebar className="dashboard-sidebar" label="Portal TKJ">
         <a className="dashboard-brand" href="#beranda">
           <img src="/LOGO_SMKN1_GARUT.jpeg" alt="" />
           <span><strong>SMKN 1 Garut</strong><small>Portal TKJ</small></span>
@@ -795,7 +796,7 @@ function DashboardPage() {
           <a href="#beranda"><ArrowLeft size={16} /> Kembali ke profil TKJ</a>
           <button type="button" onClick={signOut}><LogOut size={16} /> Keluar</button>
         </div>
-      </aside>
+      </ResponsiveSidebar>
 
       <main className="dashboard-main">
         <header className="dashboard-topbar">

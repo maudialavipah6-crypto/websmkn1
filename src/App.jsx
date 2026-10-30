@@ -10,12 +10,10 @@ import {
   Laptop,
   MapPin,
   Mail,
-  Menu,
   Phone,
   Router,
   Server,
   Wifi,
-  X,
 } from 'lucide-react';
 import { useAuth } from './auth/AuthProvider';
 
@@ -69,15 +67,15 @@ function currentRoute() {
   return hash.slice(2).split('?')[0] || 'home';
 }
 
+import ResponsiveSidebar from './components/ResponsiveSidebar';
+
 function App() {
   const { session, profile, loading: authLoading, isPasswordRecovery } = useAuth();
   const [route, setRoute] = useState(currentRoute);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const updateRoute = () => {
       setRoute(currentRoute());
-      setMenuOpen(false);
     };
     window.addEventListener('hashchange', updateRoute);
     return () => window.removeEventListener('hashchange', updateRoute);
@@ -132,22 +130,14 @@ function App() {
           </span>
         </a>
 
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-label={menuOpen ? 'Tutup navigasi' : 'Buka navigasi'}
-          aria-expanded={menuOpen}
-          aria-controls="main-navigation"
-          onClick={() => setMenuOpen((isOpen) => !isOpen)}
-        >
-          {menuOpen ? <X size={21} /> : <Menu size={21} />}
-        </button>
-
-        <nav className={`nav${menuOpen ? ' is-open' : ''}`} id="main-navigation" aria-label="Navigasi utama">
+        <ResponsiveSidebar className="site-navigation" label="SMKN 1 Garut">
+        <nav className="nav" id="main-navigation" aria-label="Navigasi utama">
           {navigation.map(([href, label]) => (
-            <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
+            <a key={href} href={href}>{label}</a>
           ))}
         </nav>
+        <a className="drawer-account-link" href={accountHref}>{accountLabel}<ArrowUpRight size={16} /></a>
+        </ResponsiveSidebar>
 
         <a className="header-cta" href={accountHref}>
           {accountLabel}

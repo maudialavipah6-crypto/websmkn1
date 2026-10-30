@@ -1,5 +1,11 @@
 # Menyiapkan autentikasi dan portal TKJ
 
+## Jika materi terlihat di dashboard tetapi tidak di beranda
+
+Jalankan seluruh isi `supabase/public-lessons.sql` di SQL Editor proyek yang sama dengan website. Skrip dapat dijalankan ulang dan hanya memberikan akses baca pengunjung pada materi **terbit** beserta lampirannya. Draf tetap privat. Migrasi `id-user-migration.sql` tidak menggantikan migrasi akses publik ini.
+
+Setelah SQL berhasil, buka beranda dalam jendela privat tanpa login, lalu cek bagian Perpustakaan TKJ dan buka salah satu lampiran. Tidak perlu membuat bucket publik atau mematikan RLS. Frontend memuat ulang daftar saat tab kembali aktif, setiap 60 detik ketika halaman terlihat, dan melalui tombol coba lagi saat gagal.
+
 Portal memakai Supabase Auth, database, dan Supabase Storage untuk akun siswa/guru, materi TKJ, lampiran privat, kuis, hasil kuis, dan presensi. Supabase belum terhubung sampai langkah berikut dilakukan untuk proyek milik sekolah.
 
 ## Aktivasi login ID dan dashboard admin
