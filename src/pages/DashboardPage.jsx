@@ -22,6 +22,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
+import AdminAccounts from '../components/AdminAccounts';
 import { getDemoDashboardData } from '../auth/demoDashboardData';
 import { prepareLessonHtml, renderLessonHtml } from '../lib/lessonContent';
 
@@ -48,6 +49,10 @@ const studentTabs = [
   { id: 'lessons', label: 'Materi TKJ', icon: BookOpen },
   { id: 'quizzes', label: 'Kuis', icon: GraduationCap },
   { id: 'attendance', label: 'Presensi', icon: ClipboardCheck },
+];
+
+const adminTabs = [
+  { id: 'accounts', label: 'Manajemen Akun', icon: Users },
 ];
 
 const newQuestion = () => ({
@@ -88,8 +93,13 @@ function DashboardPage() {
   const [attendanceTitle, setAttendanceTitle] = useState('');
 
   const isTeacher = profile?.role === 'teacher';
-  const tabs = isTeacher ? teacherTabs : studentTabs;
+  const isAdmin = profile?.role === 'admin';
+  const tabs = isAdmin ? adminTabs : isTeacher ? teacherTabs : studentTabs;
   const displayName = profile?.display_name || session?.user?.email || 'Pengguna TKJ';
+
+  useEffect(() => {
+    if (isAdmin) setActiveTab('accounts');
+  }, [isAdmin]);
 
   useEffect(() => () => {
     stagedAssetsRef.current.forEach((asset) => URL.revokeObjectURL(asset.previewUrl));
@@ -100,6 +110,13 @@ function DashboardPage() {
     if (quiet) setRefreshing(true);
     else setLoading(true);
     setErrorMessage('');
+
+    if (isAdmin) {
+      setDashboardData({});
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
 
     if (!supabase && demoMode) {
       setDashboardData(getDemoDashboardData(profile.role));
@@ -183,14 +200,14 @@ function DashboardPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [demoMode, isTeacher, profile, supabase]);
+  }, [demoMode, isAdmin, isTeacher, profile, supabase]);
 
   useEffect(() => {
     void loadData();
   }, [loadData]);
 
   useEffect(() => {
-    if (!supabase || !profile) return undefined;
+    if (!supabase || !profile || isAdmin) return undefined;
 
     const channel = supabase
       .channel(`tkj-dashboard-${profile.id}`)
@@ -212,7 +229,7 @@ function DashboardPage() {
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [loadData, profile, supabase]);
+  }, [isAdmin, loadData, profile, supabase]);
 
   const attemptsByQuiz = useMemo(
     () => new Map((dashboardData?.attempts || []).map((attempt) => [attempt.quiz_id, attempt])),
@@ -787,7 +804,7 @@ function DashboardPage() {
           </div>
           <div className="dashboard-user">
             <div className="user-avatar" aria-hidden="true">{displayName.slice(0, 1).toUpperCase()}</div>
-            <span><strong>{displayName}</strong><small>{isTeacher ? 'Guru TKJ' : 'Siswa TKJ'}</small></span>
+            <span><strong>{displayName}</strong><small>{isAdmin ? 'Admin Portal' : isTeacher ? 'Guru TKJ' : 'Siswa TKJ'}</small></span>
             <button type="button" aria-label="Keluar dari akun" onClick={signOut}><LogOut size={17} /></button>
           </div>
         </header>
@@ -797,20 +814,24 @@ function DashboardPage() {
             <div>
               <h1>{activeTab === 'overview' ? `Halo, ${displayName.split(' ')[0]}.` : sectionHeading}</h1>
               <p>
-                {isTeacher
+                {isAdmin
+                  ? 'Kelola ID pengguna, peran, status akun, dan kata sandi dari satu tempat.'
+                  : isTeacher
                   ? 'Materi, kuis, dan presensi TKJ yang Anda kelola terhubung langsung ke siswa.'
                   : 'Materi dan aktivitas TKJ yang diterbitkan guru tersedia di sini.'}
               </p>
             </div>
-            <button
-              className="refresh-button"
-              disabled={refreshing}
-              onClick={() => void loadData(true)}
-              type="button"
-            >
-              <RefreshCw size={16} className={refreshing ? 'is-spinning' : ''} />
-              Muat ulang
-            </button>
+            {!isAdmin && (
+              <button
+                className="refresh-button"
+                disabled={refreshing}
+                onClick={() => void loadData(true)}
+                type="button"
+              >
+                <RefreshCw size={16} className={refreshing ? 'is-spinning' : ''} />
+                Muat ulang
+              </button>
+            )}
           </div>
 
           {demoMode && (
@@ -834,7 +855,11 @@ function DashboardPage() {
             </div>
           )}
 
-          {activeTab === 'overview' && (
+          {activeTab === 'accounts' && isAdmin && (
+            <AdminAccounts supabase={supabase} currentUserId={profile.id} />
+          )}
+
+          {activeTab === 'overview' && !isAdmin && (
             <OverviewPanel
               isTeacher={isTeacher}
               lessons={lessons}

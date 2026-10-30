@@ -23,6 +23,177 @@
   --display: 'Manrope', sans-serif;
 }
 
+/* Admin account management */
+.admin-accounts {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-account-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-account-stats span {
+  display: flex;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid #dce5ec;
+  border-radius: 12px;
+  background: #fff;
+  color: #617286;
+  flex-direction: column;
+  font-size: 0.72rem;
+}
+
+.admin-account-stats strong {
+  color: #102b46;
+  font-size: 1.25rem;
+}
+
+.admin-account-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.admin-account-form label {
+  display: grid;
+  gap: 7px;
+  color: #304860;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.admin-account-form input,
+.admin-account-form select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cfdae3;
+  border-radius: 9px;
+  background: #fff;
+  color: #102b46;
+  font: inherit;
+  font-weight: 500;
+}
+
+.admin-account-form input:focus,
+.admin-account-form select:focus {
+  border-color: #2461d8;
+  outline: 3px solid rgb(36 97 216 / 12%);
+}
+
+.admin-active-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 9px !important;
+}
+
+.admin-active-toggle input {
+  width: 17px;
+  min-height: 17px;
+}
+
+.admin-save-button {
+  align-self: end;
+  justify-self: start;
+  min-height: 44px;
+}
+
+.admin-account-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.admin-account-row {
+  display: grid;
+  grid-template-columns: auto minmax(150px, 1fr) auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid #e1e8ee;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.admin-account-row.is-inactive {
+  background: #f7f9fb;
+  opacity: 0.72;
+}
+
+.admin-account-avatar {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #eaf1ff;
+  color: #2458b8;
+  place-items: center;
+}
+
+.admin-account-identity {
+  display: grid;
+}
+
+.admin-account-identity strong {
+  color: #142d46;
+  font-size: 0.78rem;
+}
+
+.admin-account-identity small {
+  color: #738397;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+}
+
+.admin-role-badge,
+.admin-status-badge {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #edf2f6;
+  color: #53667a;
+  font-size: 0.61rem;
+  font-weight: 800;
+}
+
+.admin-role-badge.is-admin { background: #efe9ff; color: #6542a3; }
+.admin-role-badge.is-teacher { background: #e4f4ff; color: #17638d; }
+.admin-role-badge.is-student { background: #e8f7ef; color: #24704a; }
+.admin-status-badge.is-active { background: #e8f7ef; color: #24704a; }
+
+.admin-account-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-account-actions button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d9e2e9;
+  border-radius: 8px;
+  background: #fff;
+  color: #40576e;
+  cursor: pointer;
+  place-items: center;
+}
+
+.admin-account-actions button.is-danger { color: #b33c45; }
+.admin-account-actions button:disabled { cursor: not-allowed; opacity: 0.35; }
+.admin-account-empty { margin: 18px 0 2px; color: #6a7d90; font-size: 0.74rem; }
+
+@media (max-width: 720px) {
+  .admin-account-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-account-form { grid-template-columns: minmax(0, 1fr); }
+  .admin-account-row { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .admin-status-badge { display: none; }
+  .admin-account-actions { grid-column: 2 / -1; justify-content: flex-end; }
+}
+
 * {
   box-sizing: border-box;
 }

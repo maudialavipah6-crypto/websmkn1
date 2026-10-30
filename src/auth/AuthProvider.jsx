@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, display_name, role')
+      .select('id, user_id, display_name, role, active')
       .eq('id', userId)
       .maybeSingle();
 
@@ -52,6 +52,12 @@ export function AuthProvider({ children }) {
       return;
     }
 
+    if (!data.active) {
+      await supabase.auth.signOut();
+      setProfile(null);
+      setProfileError('Akun ini sedang dinonaktifkan. Hubungi admin sekolah.');
+      return;
+    }
     setProfile(data);
   }, []);
 
