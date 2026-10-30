@@ -23,14 +23,7 @@ function errorMessage(error, fallback = 'Permintaan gagal. Silakan coba kembali.
 export default function AdminAccounts({ supabase, currentUserId }) {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch = `${user.user_id} ${user.display_name} ${roleLabels[user.role]}`.toLowerCase().includes(search.trim().toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesStatus = statusFilter === 'all' || user.active === (statusFilter === 'active');
-    return matchesSearch && matchesRole && matchesStatus;
-  });
+  const filteredUsers = users.filter((user) => `${user.user_id} ${user.display_name} ${roleLabels[user.role]}`.toLowerCase().includes(search.trim().toLowerCase()));
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState('');
@@ -229,20 +222,15 @@ export default function AdminAccounts({ supabase, currentUserId }) {
           </button>
         </div>
 
-        <div className="account-filters">
-          <label>Cari akun<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nama atau ID pengguna" /></label>
-          <label>Peran<select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="all">Semua peran</option><option value="student">Siswa</option><option value="teacher">Guru</option><option value="admin">Admin</option></select></label>
-          <label>Status<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></label>
-          <span className="account-filter-count" aria-live="polite">{filteredUsers.length} dari {users.length} akun</span>
-        </div>
+        <label className="account-search">Cari akun<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Nama, ID, atau peran" /></label>
         {loading ? (
           <p className="admin-account-empty">Memuat akun…</p>
         ) : filteredUsers.length === 0 ? (
           <p className="admin-account-empty">Tidak ada akun yang cocok.</p>
         ) : (
-          <div className="admin-account-list" role="list">
+          <div className="admin-account-list">
             {filteredUsers.map((user) => (
-              <article className={`admin-account-row${user.active ? '' : ' is-inactive'}`} key={user.id} role="listitem">
+              <article className={`admin-account-row${user.active ? '' : ' is-inactive'}`} key={user.id}>
                 <span className="admin-account-avatar"><UserRound size={18} /></span>
                 <span className="admin-account-identity">
                   <strong>{user.display_name}</strong>
