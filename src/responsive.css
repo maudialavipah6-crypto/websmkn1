@@ -140,5 +140,26 @@
   .auth-form-panel { padding: 20px 16px; }
 }
 
-.account-search { display: grid; gap: 8px; margin-block: 16px; font-size: .875rem; }
-.account-search input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #cbd8e7; border-radius: 8px; font: inherit; font-size: 16px; }
+.account-filters { display: grid; grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(140px, .45fr)) auto; align-items: end; gap: 12px; margin-block: 16px; }
+.account-filters label { display: grid; gap: 6px; color: #304860; font-size: .8125rem; font-weight: 600; }
+.account-filters input, .account-filters select { width: 100%; min-height: 44px; padding: 9px 12px; border: 1px solid #cbd8e7; border-radius: 8px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+.account-filter-count { padding-bottom: 12px; color: var(--muted); font-size: .8125rem; white-space: nowrap; }
+.admin-account-row { grid-template-columns: auto minmax(150px, 1fr) auto auto auto; }
+.admin-account-identity strong { font-size: .9375rem; line-height: 1.35; }
+.admin-account-identity small { font-size: .8125rem; }
+.owned-resource { padding: 16px; }
+.owned-resource-heading strong { white-space: normal; overflow-wrap: anywhere; font-size: .9375rem; line-height: 1.4; }
+.owned-resource-heading small, .owned-resource > p { font-size: .8125rem; line-height: 1.55; }
+.resource-actions button { min-height: 40px; padding-inline: 10px; font-size: .8125rem; }
+@media (max-width: 800px) {
+  .account-filters { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .account-filters label:first-child { grid-column: 1 / -1; }
+  .account-filter-count { padding: 0; align-self: center; }
+  .admin-account-row { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+  .admin-account-actions { grid-column: 2 / -1; justify-self: end; }
+}
+@media (max-width: 400px) {
+  .admin-account-row { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .admin-status-badge { grid-column: 2; justify-self: start; }
+  .admin-account-actions { grid-column: 3; grid-row: 2; }
+}
