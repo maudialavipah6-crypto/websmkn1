@@ -1361,9 +1361,9 @@ function TeacherQuizzes({
           {questions.map((question, questionIndex) => (
             <fieldset className="question-editor" key={questionIndex}>
               <legend>
-                <span>Soal {String(questionIndex + 1).padStart(2, '0')}</span>
+                <span className="question-number">Soal {String(questionIndex + 1).padStart(2, '0')}</span>
                 {questions.length > 3 && (
-                  <button type="button" onClick={() => onRemoveQuestion(questionIndex)}>Hapus soal</button>
+                  <button className="question-remove" type="button" onClick={() => onRemoveQuestion(questionIndex)}>Hapus</button>
                 )}
               </legend>
               <label className="sr-only" htmlFor={`question-prompt-${questionIndex}`}>Teks soal {questionIndex + 1}</label>
@@ -1401,7 +1401,7 @@ function TeacherQuizzes({
             </fieldset>
           ))}
           {questions.length < 12 && (
-            <button className="add-question-button" type="button" onClick={onAddQuestion}><Plus size={15} /> Tambah soal</button>
+            <button className="add-question-button" type="button" onClick={onAddQuestion}><Plus size={17} /> <span>Tambah soal</span></button>
           )}
           <button className="dashboard-primary" disabled={busyAction === 'quiz-create'} type="submit">
             <Send size={16} /> {busyAction === 'quiz-create' ? 'Menyimpan soal…' : 'Terbitkan kuis'}
