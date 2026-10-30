@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, X } from 'lucide-react';
 
-export default function ResponsiveSidebar({ children, className = '', label = 'Navigasi', breakpoint = 800 }) {
+export default function ResponsiveSidebar({ children, className = '', label = 'Navigasi', breakpoint = 800, triggerTarget }) {
   const query = `(max-width: ${breakpoint}px)`;
   const [mobile, setMobile] = useState(() => window.matchMedia(query).matches);
   const [open, setOpen] = useState(false);
@@ -28,8 +29,9 @@ export default function ResponsiveSidebar({ children, className = '', label = 'N
   }, [open, mobile]);
 
   if (!mobile) return <aside className={className}>{children}</aside>;
+  const menuButton = <button ref={trigger} className="drawer-trigger" type="button" aria-label={`Buka ${label}`} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(true)}><Menu size={22} /><span>Menu</span></button>;
   return <>
-    <button ref={trigger} className="drawer-trigger" type="button" aria-label={`Buka ${label}`} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(true)}><Menu size={22} /><span>Menu</span></button>
+    {triggerTarget === undefined ? menuButton : triggerTarget ? createPortal(menuButton, triggerTarget) : null}
     <dialog ref={dialog} className="mobile-drawer" aria-label={label} onCancel={() => setOpen(false)} onClose={() => setOpen(false)} onClick={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
       <div className="drawer-heading"><strong>{label}</strong><button autoFocus className="drawer-close" type="button" aria-label="Tutup menu" onClick={() => setOpen(false)}><X size={22} /></button></div>
       <div className={`drawer-content ${className}`} onClick={(event) => { if (event.target.closest('a, button')) setOpen(false); }}>{children}</div>

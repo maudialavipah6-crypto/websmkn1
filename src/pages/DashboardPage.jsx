@@ -69,6 +69,7 @@ function messageForError(error) {
 function DashboardPage() {
   const { supabase, session, profile, demoMode, signOut: signOutUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const [menuHost, setMenuHost] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -763,7 +764,7 @@ function DashboardPage() {
 
   return (
     <div className="dashboard-layout">
-      <ResponsiveSidebar className="dashboard-sidebar" label="Portal TKJ">
+      <ResponsiveSidebar className="dashboard-sidebar" label="Portal TKJ" triggerTarget={menuHost}>
         <a className="dashboard-brand" href="#beranda">
           <img src="/LOGO_SMKN1_GARUT.jpeg" alt="" />
           <span><strong>SMKN 1 Garut</strong><small>Portal TKJ</small></span>
@@ -800,6 +801,7 @@ function DashboardPage() {
 
       <main className="dashboard-main">
         <header className="dashboard-topbar">
+          <div className="dashboard-menu-host" ref={setMenuHost} />
           <div className="dashboard-breadcrumb">
             <span>Portal TKJ</span><ChevronRight size={14} /><strong>{sectionHeading}</strong>
           </div>
