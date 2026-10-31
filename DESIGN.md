@@ -2,7 +2,7 @@
 
 ## Direction
 
-Preserve the school logo, navy identity, Manrope typography, and the network illustration on the public home page. Learning tasks should feel calm and legible: clear headings, restrained borders, and visible action labels. Avoid decorative labels above headings, unnecessary shadows, and boxes nested inside other boxes.
+Preserve the school logo, navy identity, and Manrope typography. The public hero uses a direct learning headline and a short directory of material, quiz/attendance, and school profile links. Learning tasks should feel calm and legible: clear headings, restrained borders, and visible action labels. Avoid decorative labels above headings, unnecessary shadows, and boxes nested inside other boxes.
 
 This document describes the current UI. `PRODUCT.md` contains historical demo assumptions; it does not replace the implemented Supabase account, lesson, quiz, and attendance flows. This design revision does not change those backend contracts.
 
@@ -14,6 +14,7 @@ This document describes the current UI. `PRODUCT.md` contains historical demo as
 2. `styles.css`: page-specific composition and illustration styling.
 3. `design-system.css`: shared fields, action variants, type roles, resource lists, question forms, and reading surfaces.
 4. `responsive.css`: viewport-dependent composition and the native-dialog navigation drawer.
+5. `school-public.css`: public hero and school directory composition, including portrait layouts on mobile.
 
 Change a shared pattern in its owner file. Do not append another override to a page stylesheet to change every input or button. Use existing component classes when they express the same intent; a new React wrapper is not required just to share a CSS rule.
 

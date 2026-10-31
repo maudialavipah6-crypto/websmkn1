@@ -7,13 +7,10 @@ import {
   Cable,
   ChevronRight,
   Cpu,
-  Laptop,
   MapPin,
   Mail,
   Phone,
-  Router,
   Server,
-  Wifi,
 } from 'lucide-react';
 import { useAuth } from './auth/AuthProvider';
 
@@ -154,14 +151,13 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1>Merancang koneksi. Membuka kemungkinan.</h1>
+            <h1>Belajar TKJ di SMKN 1 Garut.</h1>
             <p className="hero-description">
-              Kenali Teknik Komputer dan Jaringan SMKN 1 Garut—belajar komputer, membangun
-              jaringan, dan memahami infrastruktur digital lewat praktik.
+              Materi komputer dan jaringan, kuis, serta presensi kelas dalam satu portal.
             </p>
             <div className="hero-actions">
-              <a className="button button-bright" href="#program-tkj">
-                Jelajahi program TKJ
+              <a className="button button-bright" href="#pembelajaran">
+                Buka materi
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
               <a className="button button-quiet" href={accountHref}>
@@ -175,42 +171,12 @@ function App() {
             </div>
           </motion.div>
 
-          <motion.div
-            className="topology-panel"
-            role="img"
-            aria-label="Diagram topologi jaringan TKJ"
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="panel-heading">
-              <span className="panel-dot" />
-              <span>Topologi jaringan</span>
-              <span className="panel-code">LAN / STAR</span>
-            </div>
-            <div className="topology-map">
-              <svg className="topology-lines" viewBox="0 0 480 340" aria-hidden="true">
-                <path d="M240 171 112 80M240 171 368 80M240 171 112 262M240 171 368 262" />
-                <path className="line-active" d="M112 80 240 171 368 262" />
-                <circle cx="240" cy="171" r="4" />
-                <circle cx="112" cy="80" r="3" />
-                <circle cx="368" cy="80" r="3" />
-                <circle cx="112" cy="262" r="3" />
-                <circle cx="368" cy="262" r="3" />
-              </svg>
-              <div className="topology-node node-router"><Router size={23} /><span>Router</span></div>
-              <div className="topology-node node-server"><Server size={21} /><span>Server</span></div>
-              <div className="topology-node node-client node-client-left"><Laptop size={20} /><span>Client</span></div>
-              <div className="topology-node node-client node-client-right"><Laptop size={20} /><span>Client</span></div>
-              <div className="topology-node node-wifi"><Wifi size={20} /><span>Wi-Fi</span></div>
-            </div>
-            <div className="panel-legend">
-              <span><i className="legend-line" /> Perangkat</span>
-              <span><i className="legend-node" /> Koneksi</span>
-              <a href="#program-tkj">Jelajahi <ChevronRight size={14} /></a>
-            </div>
-          </motion.div>
-          <span className="hero-coordinate" aria-hidden="true">PETA TOPOLOGI · TKJ</span>
+          <nav className="hero-resources" aria-label="Akses pembelajaran">
+            <h2>Ruang belajar TKJ</h2>
+            <a href="#pembelajaran"><span>Materi pembelajaran<small>Baca modul tanpa login</small></span><ArrowUpRight size={22}/></a>
+            <a href={accountHref}><span>Kuis dan presensi<small>Masuk dengan ID pengguna</small></span><ArrowUpRight size={22}/></a>
+            <a href="#/profil-sekolah"><span>Profil sekolah<small>Kepala sekolah dan tenaga pendidik</small></span><ArrowUpRight size={22}/></a>
+          </nav>
         </section>
 
         <section className="section purpose-section" id="tujuan">

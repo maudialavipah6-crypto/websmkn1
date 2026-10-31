@@ -6,6 +6,7 @@ import './design-tokens.css';
 import './styles.css';
 import './design-system.css';
 import './responsive.css';
+import './school-public.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

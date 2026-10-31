@@ -1,0 +1,58 @@
+/* Public learning entry and school directory. */
+.hero { min-height: 0; padding-block: clamp(40px, 6vw, 80px); background: var(--navy); }
+.hero::before, .hero::after { display: none; }
+.hero-copy h1 { max-width: 15ch; font-size: clamp(2.3rem, 4.8vw, 4.5rem); line-height: 1.08; letter-spacing: -.035em; }
+.hero-description { max-width: 42ch; font-size: 1rem; line-height: 1.7; }
+.hero-tags { display: none; }
+.hero-resources { position: relative; min-width: 0; padding: 8px 0; border-top: 1px solid #ffffff45; }
+.hero-resources h2 { margin: 16px 0 24px; font-size: 1.15rem; color: white; }
+.hero-resources a { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; border-bottom: 1px solid #ffffff35; color: white; text-decoration: none; font-size: 1rem; font-weight: 600; }
+.hero-resources small { display: block; margin-top: 5px; font-size: .875rem; font-weight: 400; color: #b9cce4; }
+.hero-resources svg { flex-shrink: 0; transition: transform .18s ease; }
+.hero-resources a:hover svg { transform: translate(2px, -2px); }
+.school-profile-hero { padding: 32px 0; background: transparent; color: var(--ink); border-bottom: 1px solid var(--line); }
+.school-profile-hero h1 { max-width: none; margin: 0 0 16px; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.15; letter-spacing: -.03em; }
+.school-profile-hero > p { color: var(--muted); margin: 0; }
+.school-profile-facts { margin-top: 28px; padding-top: 0; border: 0; }
+.school-profile-facts > div { color: var(--action); }
+.school-profile-facts span { color: var(--muted); }
+.school-profile-facts strong { color: var(--ink); }
+.school-section-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.school-section-nav a, .school-contact-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--action); font-size: .875rem; font-weight: 600; text-underline-offset: 5px; }
+.school-leadership { display: grid; grid-template-columns: minmax(160px, 260px) 1fr; align-items: center; gap: clamp(24px, 5vw, 64px); padding-block: 48px; border-bottom: 1px solid var(--line); }
+.school-leadership img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; object-position: center 15%; border-radius: 4px; }
+.school-leadership h2, .school-teachers > h2 { margin: 0 0 24px; font-size: 1.5rem; line-height: 1.3; }
+.school-leadership h3 { margin: 0 0 12px; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.35; }
+.school-leadership p { color: var(--muted); margin-bottom: 20px; }
+.school-teachers { padding-block: 48px; border-bottom: 1px solid var(--line); }
+.staff-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.staff-profile { min-width: 0; }
+.staff-profile img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; object-position: center 15%; border-radius: 4px; }
+.staff-profile h3 { margin: 20px 0 6px; font-size: 1.1rem; line-height: 1.5; }
+.staff-profile > p { margin: 0 0 16px; color: var(--muted); font-size: .875rem; }
+.staff-profile dl { margin: 0; border-top: 1px solid var(--line); }
+.staff-profile dl > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.staff-profile dt { color: var(--muted); font-size: .75rem; }
+.staff-profile dd { margin: 4px 0 0; font-size: .875rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.school-profile-page section { scroll-margin-top: 100px; }
+@media(max-width:800px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .hero-resources { width: 100%; }
+  .school-leadership { grid-template-columns: minmax(130px, 200px) minmax(0, 1fr); gap: 24px; }
+  .staff-grid { gap: 20px; }
+}
+@media(max-width:600px) {
+  .hero { padding-block: 36px; }
+  .hero-resources a { padding-block: 16px; }
+  .school-profile-page { margin-top: 20px; }
+  .school-leadership { grid-template-columns: 1fr; padding-block: 32px; }
+  .school-leadership img { max-width: 240px; }
+  .school-leadership h2 { margin-bottom: 12px; }
+  .school-teachers { padding-block: 32px; }
+  .staff-grid { grid-template-columns: 1fr; gap: 32px; }
+  .staff-profile { display: grid; grid-template-columns: minmax(95px, .7fr) minmax(0, 1fr); gap: 0 16px; align-content: start; }
+  .staff-profile img { grid-row: 1 / 5; }
+  .staff-profile h3 { margin-top: 0; font-size: 1rem; }
+  .staff-profile > p { font-size: .8rem; margin-bottom: 12px; }
+  .school-section-nav { gap: 4px 18px; }
+}
