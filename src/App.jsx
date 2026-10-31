@@ -104,7 +104,7 @@ function App() {
       return <div className="route-loading" role="status">Memeriksa sesi akun…</div>;
     }
     if (!session || !profile) {
-      return <LoginPage />;
+      return <Suspense fallback={<div className="route-loading" role="status">Memuat halaman login…</div>}><LoginPage /></Suspense>;
     }
     return (
       <Suspense fallback={<div className="route-loading" role="status">Memuat dashboard…</div>}>

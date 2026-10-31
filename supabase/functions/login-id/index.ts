@@ -5,10 +5,14 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  if (request.method !== 'POST') return json({ error: 'Metode tidak didukung.' }, 405);
   try {
-    const { userId, password } = await request.json();
+    let body;
+    try { body = await request.json(); } catch { return json({ error: 'Data login tidak valid.' }, 400); }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Data login tidak valid.' }, 400);
+    const { userId, password } = body;
     const normalizedId = String(userId || '').trim().toUpperCase();
-    if (!/^[A-Z0-9._-]{3,32}$/.test(normalizedId) || String(password || '').length < 8) {
+    if (typeof userId !== 'string' || typeof password !== 'string' || !/^[A-Z0-9._-]{3,32}$/.test(normalizedId) || password.length < 8) {
       return json({ error: 'ID Pengguna atau kata sandi tidak valid.' }, 400);
     }
 
