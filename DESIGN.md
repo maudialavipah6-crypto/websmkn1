@@ -46,6 +46,7 @@ Use regular (400) text, medium (500) navigation, semibold (600) labels/actions, 
 - **Inline action:** `.panel-action` uses a quiet surface with the same minimum touch height. Destructive actions use explicit wording or an accessible icon label and the danger color.
 - **Fields:** `.workspace-form`, `.admin-account-form`, and `.account-filters` use the same input primitive. Inputs remain 16px on phones. The text-field selector uses `:where()` exclusions so checkboxes, radios, and file pickers keep their native geometry, and option rows can override the primitive without escalating specificity.
 - **Quiz question:** `.question-editor` is a fieldset with an accessible, visually hidden legend. `.question-editor-heading` contains the visible number and remove action. Each answer is one bordered row, with a 44px label area around an 18px radio and a borderless text input. Keep one checked answer per radio group; never preselect a correct answer on the teacher's behalf.
+- **Student quiz:** `.student-question` preserves the fieldset/legend grouping without the browser's default frame. Stack answer labels with at least 44px touch height, 18px native radios, and wrapping text. Give selected answers a border and subtle fill, and keep a visible keyboard focus ring. Submission progress and the action wrap on narrow screens.
 - **Resources and accounts:** use separators between rows inside the task panel. Titles may wrap; status remains visible on mobile. Account role, status, and search filters compose together and expose a live result count.
 - **Reader/editor:** use `.lesson-reader-content` and `.rich-text-content` for the shared type measure. Images scale to their container; code blocks can scroll independently. An empty reader does not reserve a blank rectangle.
 
@@ -68,6 +69,7 @@ Place that label inside `.workspace-form` to consume the shared field primitive.
 - Below 600px, account status and action groups move to subsequent rows. Below 400px, tighten outer gutters while preserving field and button sizes.
 - Do not force a 320px document minimum: a scrollbar or zoom may leave less usable space. Verify both the document and individual form/list containers for overflow.
 - Preserve visible hover, focus, disabled, loading, error, empty, and selected states. Error/success messages must include text rather than rely on color.
+- Dashboard tab changes, opening/closing a student lesson or quiz, and arriving at a quiz result reset document scroll so the next task's heading is visible. Use an immediate reset to avoid unwanted motion.
 - Preserve the existing `prefers-reduced-motion` behavior. Do not add scroll effects or layout animations as part of a typography change.
 
 ## Verification

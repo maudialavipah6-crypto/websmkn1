@@ -150,6 +150,38 @@
 .question-choice:has(input:checked) { border-color: var(--electric-dark); background: var(--action-soft); }
 .question-choice input:focus { outline: 0; }
 
+/* Student questions use the same type and touch geometry as the authoring form. */
+.student-quiz-title { margin-bottom: var(--space-5); }
+.student-quiz-title h2, .student-quiz-result h2, .lesson-reader > h2 {
+  margin: 0 0 var(--space-3); font-size: var(--text-xl); line-height: 1.4; letter-spacing: -.015em;
+}
+.student-quiz-title > .state-badge { margin-bottom: var(--space-3); }
+.student-quiz-title p, .student-quiz-result p { margin: 0; max-width: 70ch; color: var(--muted); }
+.student-question-list { display: grid; gap: var(--space-5); }
+.student-question { min-width: 0; margin: 0; padding: 0; border: 0; }
+.student-question legend {
+  display: block; width: 100%; padding: 0; margin-bottom: var(--space-3);
+  color: var(--ink); font-size: var(--text-base); font-weight: var(--weight-semibold);
+  line-height: var(--leading-body); overflow-wrap: anywhere;
+}
+.student-question legend > span { display: block; margin-bottom: var(--space-2); color: var(--muted); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+.student-choice-list { display: grid; gap: var(--space-2); }
+.student-choice-list label {
+  display: flex; align-items: flex-start; gap: var(--space-3); min-height: var(--control-height);
+  padding: 12px; border: 1px solid var(--border-control); border-radius: var(--radius-control);
+  font-size: var(--text-base); line-height: 1.5; cursor: pointer;
+}
+.student-choice-list label > span { min-width: 0; overflow-wrap: anywhere; }
+.student-choice-list input { flex: 0 0 18px; width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--action); }
+.student-choice-list label:hover { background: var(--surface-subtle); }
+.student-choice-list label.is-selected { border-color: var(--action); background: var(--action-soft); }
+.student-choice-list label:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+.student-quiz-submit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--line); }
+.student-quiz-submit > span, .student-quiz-result > span { color: var(--muted); font-size: var(--text-sm); max-width: 70ch; }
+.student-quiz-result { display: grid; justify-items: start; gap: var(--space-4); }
+.student-quiz-result > svg { color: var(--success); }
+.student-quiz-result h2 { margin: 0; }
+
 /* Reading and editing share a legible measure. */
 .lesson-reader-content, .rich-text-content {
   color: var(--ink); font-size: var(--text-base); font-weight: var(--weight-regular); line-height: 1.75; max-width: 70ch;
