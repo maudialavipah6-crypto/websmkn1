@@ -71,6 +71,7 @@ function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [menuHost, setMenuHost] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
+  const latestLoad = useRef(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [busyAction, setBusyAction] = useState('');
@@ -117,6 +118,7 @@ function DashboardPage() {
 
   const loadData = useCallback(async (quiet = false) => {
     if (!profile) return;
+    const loadId = ++latestLoad.current;
     if (quiet) setRefreshing(true);
     else setLoading(true);
     setErrorMessage('');
@@ -184,7 +186,7 @@ function DashboardPage() {
           attemptsResult,
           attendanceResult,
         ] = results;
-        setDashboardData({
+        if (loadId === latestLoad.current) setDashboardData({
           profiles: profilesResult.data || [],
           lessons: lessonsResult.data || [],
           attachments: attachmentsResult.data || [],
@@ -195,7 +197,7 @@ function DashboardPage() {
         });
       } else {
         const [lessonsResult, attachmentsResult, quizzesResult, attemptsResult, sessionsResult, attendanceResult] = results;
-        setDashboardData({
+        if (loadId === latestLoad.current) setDashboardData({
           lessons: lessonsResult.data || [],
           attachments: attachmentsResult.data || [],
           quizzes: quizzesResult.data || [],
@@ -205,10 +207,12 @@ function DashboardPage() {
         });
       }
     } catch (error) {
-      setErrorMessage(messageForError(error));
+      if (loadId === latestLoad.current) setErrorMessage(messageForError(error));
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (loadId === latestLoad.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [demoMode, isAdmin, isTeacher, profile, supabase]);
 
@@ -219,15 +223,20 @@ function DashboardPage() {
   useEffect(() => {
     if (!supabase || !profile || isAdmin) return undefined;
 
+    let refreshTimer;
+    const scheduleRefresh = () => {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(() => void loadData(true), 250);
+    };
     const channel = supabase
       .channel(`tkj-dashboard-${profile.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'lessons' }, () => void loadData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'lesson_attachments' }, () => void loadData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quizzes' }, () => void loadData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_questions' }, () => void loadData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_attempts' }, () => void loadData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_sessions' }, () => void loadData(true))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_records' }, () => void loadData(true))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lessons' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lesson_attachments' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quizzes' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_questions' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_attempts' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_sessions' }, scheduleRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_records' }, scheduleRefresh)
       .subscribe((status) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           setRealtimeNotice('Pembaruan langsung tidak tersedia. Gunakan tombol muat ulang untuk melihat data terbaru.');
@@ -237,6 +246,7 @@ function DashboardPage() {
       });
 
     return () => {
+      window.clearTimeout(refreshTimer);
       void supabase.removeChannel(channel);
     };
   }, [isAdmin, loadData, profile, supabase]);
