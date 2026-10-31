@@ -95,6 +95,10 @@ function DashboardPage() {
   const [quizResult, setQuizResult] = useState(null);
   const [attendanceTitle, setAttendanceTitle] = useState('');
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeTab, studentQuiz?.id, quizResult?.id]);
+
   const hasUnsavedWork = Boolean(lessonTitle.trim() || lessonContent.trim() || quizTitle.trim() || quizQuestions.some((question) => question.prompt.trim() || question.choices.some((choice) => choice.trim())) || (studentQuiz && Object.keys(studentAnswers).length));
   useEffect(() => {
     if (!hasUnsavedWork) return undefined;
@@ -1475,6 +1479,9 @@ function TeacherQuizzes({
 
 function StudentLessons({ lessons, attachments, supabase, demoMode }) {
   const [selectedLesson, setSelectedLesson] = useState(null);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [selectedLesson?.id]);
   const [signedUrls, setSignedUrls] = useState(new Map());
   const [assetError, setAssetError] = useState('');
   const selectedAttachments = useMemo(
