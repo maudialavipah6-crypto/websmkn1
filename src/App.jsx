@@ -145,6 +145,17 @@ function App() {
 
       <main>
         <section className="hero" id="beranda">
+          {!reduceMotion && (
+            <div className="hero-video" aria-hidden="true">
+              <iframe
+                title="Video latar hero SMKN 1 Garut"
+                src="https://www.youtube-nocookie.com/embed/DwurPyuaxi4?autoplay=1&mute=1&loop=1&playlist=DwurPyuaxi4&controls=0&rel=0&playsinline=1&modestbranding=1&disablekb=1"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                tabIndex={-1}
+                loading="eager"
+              />
+            </div>
+          )}
           <motion.div
             className="hero-copy"
             initial={reduceMotion ? false : { opacity: 0, y: 22 }}

@@ -1,6 +1,9 @@
 /* Public learning entry and school directory. */
 .hero { min-height: 0; padding-block: clamp(40px, 6vw, 80px); background: var(--navy); }
-.hero::before, .hero::after { display: none; }
+.hero::before { position: absolute; z-index: -1; inset: 0; display: block; background: linear-gradient(90deg, rgba(5, 20, 40, .91) 0%, rgba(5, 20, 40, .72) 48%, rgba(5, 20, 40, .55) 100%); content: ''; }
+.hero::after { display: none; }
+.hero-video { position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; background: var(--navy); }
+.hero-video iframe { position: absolute; top: 50%; left: 50%; width: max(100%, 177.78vh); height: max(100%, 56.25vw); border: 0; transform: translate(-50%, -50%); }
 .hero-copy h1 { max-width: 15ch; font-size: clamp(2.3rem, 4.8vw, 4.5rem); line-height: 1.08; letter-spacing: -.035em; }
 .hero-description { max-width: 42ch; font-size: 1rem; line-height: 1.7; }
 .hero-tags { display: none; }
@@ -43,6 +46,7 @@
 }
 @media(max-width:600px) {
   .hero { padding-block: 36px; }
+  .hero::before { background: linear-gradient(90deg, rgba(5, 20, 40, .82), rgba(5, 20, 40, .65)); }
   .hero-resources a { padding-block: 16px; }
   .school-profile-page { margin-top: 20px; }
   .school-leadership { grid-template-columns: 1fr; padding-block: 32px; }
