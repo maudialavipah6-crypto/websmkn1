@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 import AdminAccounts from '../components/AdminAccounts';
+import LessonErrorBoundary from '../components/LessonErrorBoundary';
 import ResponsiveSidebar from '../components/ResponsiveSidebar';
 import { getDemoDashboardData } from '../auth/demoDashboardData';
 import { prepareLessonHtml, renderLessonHtml } from '../lib/lessonContent';
@@ -68,7 +69,10 @@ function messageForError(error) {
 
 function DashboardPage() {
   const { supabase, session, profile, demoMode, signOut: signOutUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (profile?.role === 'admin') return 'accounts';
+    return window.location.hash === '#/dashboard?tab=lessons' ? 'lessons' : 'overview';
+  });
   const [menuHost, setMenuHost] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const latestLoad = useRef(0);
@@ -98,6 +102,15 @@ function DashboardPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [activeTab, studentQuiz?.id, quizResult?.id]);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (activeTab === 'lessons' && hash === '#/dashboard') {
+      window.history.replaceState(window.history.state, '', '#/dashboard?tab=lessons');
+    } else if (activeTab !== 'lessons' && hash === '#/dashboard?tab=lessons') {
+      window.history.replaceState(window.history.state, '', '#/dashboard');
+    }
+  }, [activeTab]);
 
   const hasUnsavedWork = Boolean(lessonTitle.trim() || lessonContent.trim() || quizTitle.trim() || quizQuestions.some((question) => question.prompt.trim() || question.choices.some((choice) => choice.trim())) || (studentQuiz && Object.keys(studentAnswers).length));
   useEffect(() => {
@@ -900,8 +913,9 @@ function DashboardPage() {
             />
           )}
 
-          {activeTab === 'lessons' && (
-            isTeacher ? (
+          {activeTab === 'lessons' && !isAdmin && (
+            <LessonErrorBoundary>
+            {isTeacher ? (
               <TeacherLessons
                 lessons={lessons}
                 attachments={dashboardData?.attachments || []}
@@ -936,7 +950,8 @@ function DashboardPage() {
                 supabase={supabase}
                 demoMode={demoMode}
               />
-            )
+            )}
+            </LessonErrorBoundary>
           )}
 
           {activeTab === 'quizzes' && (
