@@ -84,6 +84,41 @@
 }
 
 /* Shared control geometry; color communicates action priority. */
+a.back-home-link:not(.auth-mobile-back) { display: inline-flex; }
+a.back-home-link {
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: var(--control-height);
+  padding: 6px 14px 6px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--action-soft);
+  color: var(--navy);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1.3;
+  text-decoration: none;
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease;
+}
+.back-home-link-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  height: 30px;
+  border-radius: var(--radius-control);
+  background: var(--action);
+  color: var(--white);
+}
+a.back-home-link:hover { color: var(--navy); border-color: var(--action); background: var(--white); text-decoration: none; }
+a.back-home-link:focus-visible { outline: 2px solid var(--action); outline-offset: 3px; }
+a.back-home-link--inverse { background: var(--navy-mid); color: var(--white); border-color: var(--navy-light); }
+a.back-home-link--inverse .back-home-link-icon { background: var(--cyan-soft); color: var(--navy); }
+a.back-home-link--inverse:hover { background: var(--navy-light); color: var(--white); border-color: var(--cyan-soft); }
+a.back-home-link--inverse:focus-visible { outline-color: var(--cyan-soft); }
+.material-page > .back-home-link { margin-bottom: 12px; }
+
 .dashboard-primary, .student-resource-card > button, .resource-actions button,
 .refresh-button, .lesson-cancel-button, .add-question-button, .question-remove,
 .back-to-list, .public-back, .school-profile-back, .panel-action,

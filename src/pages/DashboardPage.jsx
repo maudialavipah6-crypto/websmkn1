@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 import AdminAccounts from '../components/AdminAccounts';
+import BackHomeLink from '../components/BackHomeLink';
 import LessonErrorBoundary from '../components/LessonErrorBoundary';
 import LessonVideo from '../components/LessonVideo';
 import ResponsiveSidebar from '../components/ResponsiveSidebar';
@@ -845,7 +846,7 @@ function DashboardPage() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <a href="#beranda"><ArrowLeft size={16} /> Kembali ke profil TKJ</a>
+          <BackHomeLink />
           <button type="button" onClick={signOut}><LogOut size={16} /> Keluar</button>
         </div>
       </ResponsiveSidebar>

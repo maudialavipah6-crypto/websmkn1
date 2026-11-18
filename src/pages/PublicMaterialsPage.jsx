@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, BookOpen, FileText, Play, Search } from 'lucide-react';
+import BackHomeLink from '../components/BackHomeLink';
 import LessonVideo from '../components/LessonVideo';
 import { supabase } from '../lib/supabase';
 import { renderLessonHtml } from '../lib/lessonContent';
@@ -98,9 +99,9 @@ export default function PublicMaterialsPage({ lessonId }) {
       </nav>
     </header>
     <main className="section material-page">
-      <a className="public-back" href={lessonId ? materialHref : '#beranda'}>
-        <ArrowLeft size={16} /> {lessonId ? 'Kembali ke Materi TKJ' : 'Kembali ke Beranda'}
-      </a>
+      {lessonId ? (
+        <a className="public-back" href={materialHref}><ArrowLeft size={16} /> Kembali ke Materi TKJ</a>
+      ) : <BackHomeLink />}
       {lesson ? (
         <article className="material-reader">
           <header className="material-reader-heading">

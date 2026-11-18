@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  ArrowLeft,
   ArrowRight,
   BookOpen,
   Eye,
@@ -11,6 +10,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
+import BackHomeLink from '../components/BackHomeLink';
 
 function LoginPage() {
   const {
@@ -75,7 +75,7 @@ function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-brand-panel">
-        <a className="auth-back-link" href="#beranda"><ArrowLeft size={16} /> Kembali ke situs TKJ</a>
+        <BackHomeLink className="auth-back-link" inverse />
         <div className="auth-brand-content">
           <img className="auth-logo" src="/LOGO_SMKN1_GARUT.jpeg" alt="Logo SMKN 1 Garut" />
           <p className="auth-school-name">SMKN 1 Garut</p>
@@ -97,7 +97,7 @@ function LoginPage() {
 
       <section className="auth-form-panel">
         <div className="auth-form-wrap">
-          <a className="auth-mobile-back" href="#beranda"><ArrowLeft size={15} /> Situs TKJ</a>
+          <BackHomeLink className="auth-mobile-back" />
           {session && profile && !demoMode && (
             <div className="auth-session-notice" role="status">
               Anda sudah masuk sebagai {roleLabel}.
