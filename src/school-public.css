@@ -38,6 +38,37 @@
 .staff-profile dt { color: var(--muted); font-size: .75rem; }
 .staff-profile dd { margin: 4px 0 0; font-size: .875rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .school-profile-page section { scroll-margin-top: 100px; }
+.school-profile-content {
+  padding-block: clamp(28px, 5vw, 48px);
+  border-bottom: 1px solid var(--line);
+}
+.school-profile-content h2 { margin: 0 0 16px; font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.25; }
+.school-profile-content h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.4; }
+.school-profile-content p { max-width: 72ch; margin: 0; line-height: 1.65; color: var(--muted); }
+.school-profile-content p + p { margin-top: 12px; }
+.school-profile-content strong { color: var(--ink); }
+.school-history, .school-profile-points { list-style: none; padding: 0; margin: 16px 0 0; }
+.school-history > li {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 12px;
+  padding-block: 14px;
+  border-top: 1px solid var(--line);
+}
+.school-history time { color: var(--action); font-weight: 700; font-variant-numeric: tabular-nums; }
+.school-profile-content .school-mission-heading { margin-top: 24px; }
+.school-profile-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+.school-profile-points > li { padding-top: 12px; border-top: 1px solid var(--line); }
+.school-profile-topics { margin-block: 16px; border-top: 1px solid var(--line); }
+.school-profile-topics details { border-bottom: 1px solid var(--line); }
+.school-profile-topics summary { padding: 14px 4px; cursor: pointer; font-weight: 700; }
+.school-profile-topics summary::marker { color: var(--action); }
+.school-profile-topics ul { margin: 0 0 16px; padding-inline-start: 24px; color: var(--muted); line-height: 1.6; }
+.school-profile-topics li + li { margin-top: 6px; }
 @media(max-width:800px) {
   .hero { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .hero-resources { width: 100%; }
@@ -45,6 +76,7 @@
   .staff-grid { gap: 20px; }
 }
 @media(max-width:600px) {
+  .school-profile-points { grid-template-columns: minmax(0, 1fr); }
   .hero { padding-block: 36px; }
   .hero::before { background: linear-gradient(90deg, rgba(5, 20, 40, .82), rgba(5, 20, 40, .65)); }
   .hero-resources a { padding-block: 16px; }
