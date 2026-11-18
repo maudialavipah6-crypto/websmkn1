@@ -24,9 +24,11 @@ import {
 import { useAuth } from '../auth/AuthProvider';
 import AdminAccounts from '../components/AdminAccounts';
 import LessonErrorBoundary from '../components/LessonErrorBoundary';
+import LessonVideo from '../components/LessonVideo';
 import ResponsiveSidebar from '../components/ResponsiveSidebar';
 import { getDemoDashboardData } from '../auth/demoDashboardData';
 import { prepareLessonHtml, renderLessonHtml } from '../lib/lessonContent';
+import { lessonVideoId, youtubeId } from '../lib/lessonVideo';
 
 const RichTextEditor = lazy(() => import('../components/RichTextEditor'));
 const COURSE_ASSET_BUCKET = 'tkj-course-assets';
@@ -85,8 +87,9 @@ function DashboardPage() {
   const [lessonTitle, setLessonTitle] = useState('');
   const [lessonSummary, setLessonSummary] = useState('');
   const [lessonContent, setLessonContent] = useState('');
+  const [lessonVideo, setLessonVideo] = useState('');
+  const [lessonFormOpen, setLessonFormOpen] = useState(false);
   const [lessonEditing, setLessonEditing] = useState(null);
-  const [lessonIsPublished, setLessonIsPublished] = useState(true);
   const [lessonStagedAssets, setLessonStagedAssets] = useState([]);
   const [lessonRemovedAttachmentIds, setLessonRemovedAttachmentIds] = useState([]);
   const stagedAssetsRef = useRef(lessonStagedAssets);
@@ -112,7 +115,7 @@ function DashboardPage() {
     }
   }, [activeTab]);
 
-  const hasUnsavedWork = Boolean(lessonTitle.trim() || lessonContent.trim() || quizTitle.trim() || quizQuestions.some((question) => question.prompt.trim() || question.choices.some((choice) => choice.trim())) || (studentQuiz && Object.keys(studentAnswers).length));
+  const hasUnsavedWork = Boolean(lessonTitle.trim() || lessonSummary.trim() || lessonContent.trim() || lessonVideo.trim() || lessonStagedAssets.length || quizTitle.trim() || quizQuestions.some((question) => question.prompt.trim() || question.choices.some((choice) => choice.trim())) || (studentQuiz && Object.keys(studentAnswers).length));
   useEffect(() => {
     if (!hasUnsavedWork) return undefined;
     const warn = (event) => { event.preventDefault(); event.returnValue = ''; };
@@ -320,6 +323,8 @@ function DashboardPage() {
   }
 
   function resetLessonForm() {
+    setLessonFormOpen(false);
+    setLessonVideo('');
     stagedAssetsRef.current.forEach((asset) => URL.revokeObjectURL(asset.previewUrl));
     setLessonStagedAssets([]);
     setLessonRemovedAttachmentIds([]);
@@ -327,13 +332,14 @@ function DashboardPage() {
     setLessonTitle('');
     setLessonSummary('');
     setLessonContent('');
-    setLessonIsPublished(true);
   }
 
   function editLesson(lesson) {
     const hasUnsavedChanges = lessonEditing
       || lessonStagedAssets.length > 0
       || lessonTitle.trim()
+      || lessonSummary.trim()
+      || lessonVideo.trim()
       || lessonContent.trim();
     if (hasUnsavedChanges && !window.confirm('Ganti materi yang sedang diedit? Perubahan yang belum disimpan akan dibuang.')) return;
     resetLessonForm();
@@ -341,7 +347,8 @@ function DashboardPage() {
     setLessonTitle(lesson.title);
     setLessonSummary(lesson.summary || '');
     setLessonContent(lesson.content || '');
-    setLessonIsPublished(lesson.is_published);
+    setLessonVideo(lesson.video_url || '');
+    setLessonFormOpen(true);
     setLessonRemovedAttachmentIds([]);
     setActiveTab('lessons');
     clearFeedback();
@@ -351,6 +358,12 @@ function DashboardPage() {
     event.preventDefault();
     const title = lessonTitle.trim();
     const summary = lessonSummary.trim();
+    const videoId = youtubeId(lessonVideo);
+    const publish = (event.nativeEvent.submitter?.value ?? (lessonEditing?.is_published ? 'publish' : 'draft')) === 'publish';
+    if (lessonVideo.trim() && !videoId) {
+      setErrorMessage('Masukkan tautan video YouTube yang valid.');
+      return;
+    }
     if (!title || !lessonContent.trim()) {
       clearFeedback();
       setErrorMessage('Isi judul dan isi materi sebelum menyimpan.');
@@ -429,8 +442,10 @@ function DashboardPage() {
         title,
         summary,
         content,
-        is_published: lessonIsPublished,
+        ...(videoId || lessonEditing?.video_url ? { video_url: videoId ? `https://www.youtube.com/watch?v=${videoId}` : null } : {}),
+        is_published: publish,
       }).eq('id', lessonId).select('id').single();
+      if (saveError?.code === 'PGRST204' && videoId) throw new Error('Kolom video belum tersedia. Hubungi pengelola situs untuk mengaktifkannya.');
       if (saveError) throw new Error(saveError.message);
 
       let cleanupWarning = '';
@@ -451,7 +466,7 @@ function DashboardPage() {
         }
       }
 
-      const statusText = lessonIsPublished ? 'diterbitkan untuk siswa' : 'disimpan sebagai draf';
+      const statusText = publish ? 'diterbitkan untuk siswa' : 'disimpan sebagai draf';
       setSuccessMessage(`Materi TKJ berhasil ${statusText}.${cleanupWarning}`);
       resetLessonForm();
       await loadData(true);
@@ -926,7 +941,10 @@ function DashboardPage() {
                 summary={lessonSummary}
                 content={lessonContent}
                 editingLesson={lessonEditing}
-                isPublished={lessonIsPublished}
+                video={lessonVideo}
+                formOpen={lessonFormOpen}
+                onAdd={() => setLessonFormOpen(true)}
+                onVideoChange={setLessonVideo}
                 stagedAssets={lessonStagedAssets}
                 removedAttachmentIds={lessonRemovedAttachmentIds}
                 onTitleChange={setLessonTitle}
@@ -936,7 +954,6 @@ function DashboardPage() {
                 onRemoveStagedAsset={removeStagedLessonAsset}
                 onRemoveAttachment={(id) => setLessonRemovedAttachmentIds((current) => [...current, id])}
                 onRestoreAttachment={(id) => setLessonRemovedAttachmentIds((current) => current.filter((value) => value !== id))}
-                onPublishedChange={setLessonIsPublished}
                 onCancelEdit={resetLessonForm}
                 onEdit={editLesson}
                 onSave={saveLesson}
@@ -1207,7 +1224,10 @@ function TeacherLessons({
   summary,
   content,
   editingLesson,
-  isPublished,
+  video,
+  formOpen,
+  onAdd,
+  onVideoChange,
   stagedAssets,
   removedAttachmentIds,
   onTitleChange,
@@ -1217,7 +1237,6 @@ function TeacherLessons({
   onRemoveStagedAsset,
   onRemoveAttachment,
   onRestoreAttachment,
-  onPublishedChange,
   onCancelEdit,
   onEdit,
   onSave,
@@ -1231,6 +1250,12 @@ function TeacherLessons({
   const [signedUrls, setSignedUrls] = useState(new Map());
   const [attachmentError, setAttachmentError] = useState('');
   const lessonBusy = editingLesson ? busyAction === `lesson-${editingLesson.id}` : busyAction === 'lesson-save';
+  const videoId = youtubeId(video);
+  const formHeading = useRef(null);
+
+  useEffect(() => {
+    if (formOpen) formHeading.current?.focus();
+  }, [formOpen, editingLesson?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1257,13 +1282,10 @@ function TeacherLessons({
   }, [currentAttachments, demoMode, editingLesson, supabase]);
 
   return (
-    <div className="workspace-grid">
-      <section className="dashboard-panel workspace-form-panel">
-        <PanelHeading title={editingLesson ? 'Edit materi TKJ' : 'Buat materi TKJ'} />
+    <div className="lesson-workspace">
+      {formOpen && !demoMode && <section className="dashboard-panel workspace-form-panel">
+        <h2 ref={formHeading} tabIndex={-1}>{editingLesson ? 'Edit materi TKJ' : 'Tambah materi TKJ'}</h2>
         <p className="workspace-description">Susun materi dengan format teks, gambar, dan lampiran PDF. Simpan sebagai draf atau terbitkan untuk siswa.</p>
-        {demoMode ? (
-          <DemoReadOnlyNotice />
-        ) : (
         <form className="workspace-form lesson-author-form" onSubmit={onSave}>
           <label>Judul materi
             <input maxLength={140} required value={title} onChange={(event) => onTitleChange(event.target.value)} placeholder="Contoh: Dasar topologi jaringan" />
@@ -1273,9 +1295,10 @@ function TeacherLessons({
           </label>
           <div className="lesson-editor-field">
             <span>Isi materi</span>
+            <LessonErrorBoundary>
             <Suspense fallback={<div className="rich-text-loading" aria-live="polite">Menyiapkan editor materi…</div>}>
               <RichTextEditor
-                content={editingLesson ? renderLessonHtml(content, signedUrls) : content}
+                content={editingLesson && content === editingLesson.content ? renderLessonHtml(content, signedUrls, { editing: true }) : content}
                 disabled={lessonBusy}
                 onChange={onContentChange}
                 onStageFiles={onStageFiles}
@@ -1283,8 +1306,14 @@ function TeacherLessons({
                 onRemoveStagedAsset={onRemoveStagedAsset}
               />
             </Suspense>
+            </LessonErrorBoundary>
             <small>Maksimal 50.000 karakter. Berkas gambar dan PDF maksimal 10 MB per file.</small>
           </div>
+          <label>Tautan YouTube (opsional)
+            <input type="url" maxLength={500} value={video} onChange={event => onVideoChange(event.target.value)} placeholder="https://youtu.be/…" />
+            <small>Video bisa diputar langsung di halaman baca materi.</small>
+          </label>
+          {videoId && <LessonVideo key={videoId} id={videoId} title="Pratinjau video YouTube" />}
           {attachmentError && <p className="lesson-asset-error" role="alert">{attachmentError}</p>}
           {editingLesson && currentAttachments.length > 0 && (
             <div className="current-attachment-group">
@@ -1295,7 +1324,9 @@ function TeacherLessons({
                   return (
                     <li className={removed ? 'is-removed' : ''} key={attachment.id}>
                       {attachment.mime_type.startsWith('image/') ? <BookOpen size={15} /> : <ClipboardCheck size={15} />}
-                      <span>{attachment.file_name}</span>
+                      {signedUrls.has(attachment.storage_path) && !removed
+                        ? <a href={signedUrls.get(attachment.storage_path)} target="_blank" rel="noreferrer">{attachment.file_name}</a>
+                        : <span>{attachment.file_name}</span>}
                       <button
                         type="button"
                         onClick={() => removed ? onRestoreAttachment(attachment.id) : onRemoveAttachment(attachment.id)}
@@ -1308,25 +1339,25 @@ function TeacherLessons({
               </ul>
             </div>
           )}
-          <label className="lesson-publish-toggle">
-            <input checked={isPublished} onChange={(event) => onPublishedChange(event.target.checked)} type="checkbox" />
-            <span><strong>Terbitkan sebagai materi publik</strong><small>Materi terbit dapat dibaca tanpa login. Matikan untuk menyimpan sebagai draf.</small></span>
-          </label>
           <div className="lesson-form-actions">
-            <button className="dashboard-primary" disabled={lessonBusy} type="submit">
-              <Send size={16} /> {lessonBusy ? 'Menyimpan…' : editingLesson ? 'Simpan perubahan' : 'Simpan materi'}
+            <button className="dashboard-primary" disabled={lessonBusy} type="submit" value={editingLesson?.is_published ? 'publish' : 'draft'}>
+              {lessonBusy ? 'Menyimpan…' : editingLesson?.is_published ? 'Simpan perubahan' : 'Simpan sebagai draf'}
             </button>
-            {editingLesson && (
-              <button className="lesson-cancel-button" disabled={lessonBusy} onClick={onCancelEdit} type="button">
-                Batal
+            {!editingLesson?.is_published && (
+              <button className="dashboard-primary" disabled={lessonBusy} type="submit" value="publish">
+                <Send size={16} /> Terbitkan
               </button>
             )}
+            <button className="lesson-cancel-button" disabled={lessonBusy} onClick={onCancelEdit} type="button">Batal</button>
           </div>
         </form>
-        )}
-      </section>
+      </section>}
       <section className="dashboard-panel workspace-list-panel">
-        <PanelHeading title={`Materi Anda · ${lessons.length}`} />
+        <div className="material-list-heading">
+          <h2>Materi Saya · {lessons.length}</h2>
+          {!demoMode && !formOpen && <button className="dashboard-primary" type="button" onClick={onAdd}><Plus size={16} /> Tambah Materi</button>}
+        </div>
+        {demoMode && <DemoReadOnlyNotice />}
         {lessons.length === 0 ? (
           <EmptyDashboard title="Belum ada materi." description="Materi yang dibuat akan muncul di daftar ini." icon={BookOpen} />
         ) : (
@@ -1345,13 +1376,13 @@ function TeacherLessons({
                   </small>
                 )}
                 {!demoMode && <div className="resource-actions">
-                  <button type="button" disabled={busyAction === `lesson-${lesson.id}`} onClick={() => onEdit(lesson)}>
+                  <button type="button" disabled={lessonBusy || busyAction === `lesson-${lesson.id}`} onClick={() => onEdit(lesson)}>
                     <Eye size={15} /> Edit materi
                   </button>
-                  <button type="button" disabled={busyAction === `lesson-${lesson.id}`} onClick={() => void onPublish(lesson)}>
+                  <button type="button" disabled={lessonBusy || busyAction === `lesson-${lesson.id}`} onClick={() => void onPublish(lesson)}>
                     <Eye size={15} /> {lesson.is_published ? 'Simpan sebagai draf' : 'Terbitkan'}
                   </button>
-                  <button className="is-danger" type="button" disabled={busyAction === `lesson-${lesson.id}`} onClick={() => void onDelete(lesson)}>
+                  <button className="is-danger" type="button" disabled={lessonBusy || busyAction === `lesson-${lesson.id}`} onClick={() => void onDelete(lesson)}>
                     <X size={15} /> Hapus
                   </button>
                 </div>}
@@ -1537,6 +1568,7 @@ function StudentLessons({ lessons, attachments, supabase, demoMode }) {
     return <EmptyWorkspace title="Belum ada materi diterbitkan." description="Materi TKJ akan tampil setelah guru menerbitkannya." icon={BookOpen} />;
   }
   if (selectedLesson) {
+    const videoId = lessonVideoId(selectedLesson);
     return (
       <section className="dashboard-panel lesson-reader">
         <button className="back-to-list" type="button" onClick={() => setSelectedLesson(null)}><ArrowLeft size={15} /> Kembali ke materi</button>
@@ -1546,6 +1578,7 @@ function StudentLessons({ lessons, attachments, supabase, demoMode }) {
           className="lesson-reader-content"
           dangerouslySetInnerHTML={{ __html: renderLessonHtml(selectedLesson.content, signedUrls) }}
         />
+        {videoId && <LessonVideo key={videoId} id={videoId} title={`Video: ${selectedLesson.title}`} />}
         {assetError && <p className="lesson-asset-error" role="alert">{assetError}</p>}
         {selectedAttachments.length > 0 && (
           <section className="lesson-downloads" aria-labelledby="lesson-download-heading">

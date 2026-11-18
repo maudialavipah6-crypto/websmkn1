@@ -46,14 +46,15 @@ export function prepareLessonHtml(html, uploadedPaths, allowedExistingPaths) {
   return sanitizeLessonHtml(documentFragment.body.innerHTML);
 }
 
-export function renderLessonHtml(html, signedUrls) {
+export function renderLessonHtml(html, signedUrls, { editing = false } = {}) {
   const safeHtml = sanitizeLessonHtml(html);
   const documentFragment = new DOMParser().parseFromString(safeHtml, 'text/html');
 
   documentFragment.querySelectorAll('img[data-asset-path]').forEach((image) => {
     const signedUrl = signedUrls.get(image.dataset.assetPath);
     if (!signedUrl) {
-      image.remove();
+      if (editing) image.setAttribute('src', '');
+      else image.remove();
       return;
     }
     image.setAttribute('src', signedUrl);

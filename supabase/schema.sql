@@ -104,6 +104,7 @@ create table if not exists public.lessons (
   title text not null check (char_length(title) between 1 and 140),
   summary text not null default '' check (char_length(summary) <= 500),
   content text not null check (char_length(content) between 1 and 50000),
+  video_url text,
   is_published boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

@@ -16,7 +16,7 @@ import { useAuth } from './auth/AuthProvider';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
-const PublicLessons = lazy(() => import('./components/PublicLessons'));
+const PublicMaterialsPage = lazy(() => import('./pages/PublicMaterialsPage'));
 const SchoolProfilePage = lazy(() => import('./pages/SchoolProfilePage'));
 
 // Ganti data dan foto masing-masing anggota setelah tersedia.
@@ -53,13 +53,14 @@ const navigation = [
   ['#beranda', 'Beranda'],
   ['#tujuan', 'Tujuan'],
   ['#program-tkj', 'Program TKJ'],
-  ['#pembelajaran', 'Pembelajaran'],
+  ['#/materi', 'Materi TKJ'],
   ['#/profil-sekolah', 'Profil Sekolah'],
   ['#pembuat', 'Pembuat'],
 ];
 
 function currentRoute() {
   const hash = window.location.hash;
+  if (hash === '#pembelajaran') return 'materi';
   if (!hash.startsWith('#/')) return 'home';
   return hash.slice(2).split('?')[0] || 'home';
 }
@@ -94,6 +95,15 @@ function App() {
 
   if (route === 'profil-sekolah') {
     return <Suspense fallback={<div className="route-loading" role="status">Memuat profil sekolah…</div>}><SchoolProfilePage /></Suspense>;
+  }
+
+  if (route === 'materi' || route.startsWith('materi/')) {
+    const lessonId = route === 'materi' ? null : route.slice('materi/'.length);
+    return (
+      <Suspense fallback={<div className="route-loading" role="status">Memuat halaman materi…</div>}>
+        <PublicMaterialsPage key={route} lessonId={lessonId} />
+      </Suspense>
+    );
   }
 
   if (route === 'dashboard') {
@@ -167,8 +177,8 @@ function App() {
               Materi komputer dan jaringan, kuis, serta presensi kelas dalam satu portal.
             </p>
             <div className="hero-actions">
-              <a className="button button-bright" href="#pembelajaran">
-                Buka materi
+              <a className="button button-bright" href="#/materi">
+                Buka Materi TKJ
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
               <a className="button button-quiet" href={accountHref}>
@@ -184,7 +194,7 @@ function App() {
 
           <nav className="hero-resources" aria-label="Akses pembelajaran">
             <h2>Ruang belajar TKJ</h2>
-            <a href="#pembelajaran"><span>Materi pembelajaran<small>Baca modul tanpa login</small></span><ArrowUpRight size={22}/></a>
+            <a href="#/materi"><span>Materi pembelajaran<small>Baca modul tanpa login</small></span><ArrowUpRight size={22}/></a>
             <a href={accountHref}><span>Kuis dan presensi<small>Masuk dengan ID pengguna</small></span><ArrowUpRight size={22}/></a>
             <a href="#/profil-sekolah"><span>Profil sekolah<small>Kepala sekolah dan tenaga pendidik</small></span><ArrowUpRight size={22}/></a>
           </nav>
@@ -220,17 +230,6 @@ function App() {
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="section learning-section" id="pembelajaran">
-          <div className="section-heading learning-heading">
-            <div><h2>Materi yang bisa dibaca kapan saja.</h2></div>
-            <p className="section-intro">
-              Baca modul yang diterbitkan guru tanpa login. Untuk mengerjakan kuis dan mencatat presensi, masuk ke dashboard siswa.
-            </p>
-          </div>
-          <Suspense fallback={<p className="public-state" role="status">Menyiapkan daftar materi…</p>}><PublicLessons /></Suspense>
-          <div className="learning-footnote">Kuis dan presensi khusus akun siswa. <a href={accountHref}>{accountLabel} <ArrowRight size={15} /></a></div>
         </section>
 
         <section className="section school-section" id="profil-sekolah"><div className="section-heading"><div><h2>Kenali SMKN 1 Garut.</h2></div><p className="section-intro">Lihat identitas, sejarah singkat, program keahlian, dan informasi resmi sekolah.</p></div><a className="inline-link" href="#/profil-sekolah">Lihat profil lengkap <ArrowRight size={16}/></a></section>
@@ -295,7 +294,7 @@ function App() {
         <div className="footer-nav">
           <a href="#tujuan">Tujuan web</a>
           <a href="#program-tkj">Program TKJ</a>
-          <a href="#pembelajaran">Pembelajaran</a>
+          <a href="#/materi">Materi TKJ</a>
           <a href="#profil-sekolah">Profil sekolah</a>
           <a href="#pembuat">Pembuat</a>
           <a href="#kontak">Kontak</a>

@@ -1,4 +1,24 @@
 /* Public learning entry and school directory. */
+.material-page { margin-block: clamp(24px, 5vw, 56px); }
+.material-page-heading { margin-block: 24px; }
+.material-page h1 { margin: 0 0 12px; font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.15; overflow-wrap: anywhere; }
+.material-page-heading p { color: var(--muted); }
+.material-page .public-reader { margin-top: 16px; }
+.material-page .public-lesson { min-height: 0; gap: 8px; overflow-wrap: anywhere; }
+.material-page .public-lesson h2 { margin: 0; font-size: 1.25rem; line-height: 1.3; }
+.material-card-assets { display: flex; flex-wrap: wrap; gap: 8px; }
+.material-card-assets span { border: 1px solid var(--line); padding: 2px 8px; font-size: var(--text-sm); }
+.material-page .public-lesson .inline-link { align-self: flex-start; margin-top: auto; min-height: 44px; }
+.lesson-workspace { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.lesson-workspace .workspace-form-panel > h2 { margin: 0 0 16px; }
+.material-list-heading { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.material-list-heading h2 { margin: 0; }
+.lesson-video { width: min(100%, 720px); min-width: 0; margin-block: 12px; }
+.lesson-video iframe, .lesson-video button { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+.lesson-video button { position: relative; padding: 0; cursor: pointer; background: var(--navy); color: var(--white); }
+.lesson-video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lesson-video button span { position: relative; display: inline-flex; gap: 8px; align-items: center; padding: 12px 16px; background: var(--navy); color: var(--white); }
+.lesson-video > a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; }
 .hero { min-height: 0; padding-block: clamp(40px, 6vw, 80px); background: var(--navy); }
 .hero::before { position: absolute; z-index: -1; inset: 0; display: block; background: linear-gradient(90deg, rgba(5, 20, 40, .91) 0%, rgba(5, 20, 40, .72) 48%, rgba(5, 20, 40, .55) 100%); content: ''; }
 .hero::after { display: none; }
