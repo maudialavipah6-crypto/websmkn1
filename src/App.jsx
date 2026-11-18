@@ -23,7 +23,7 @@ const SchoolProfilePage = lazy(() => import('./pages/SchoolProfilePage'));
 const creators = [
   { name: 'Khoir Nur Wahid', nim: '2657201073021', photo: '/creators/wahid.webp' },
   { name: 'M Ahyar Darya', nim: '2657201310', photo: '/creators/ahyar.jpg' },
-  { name: 'Dina Aulia Salsabila', nim: '2657201073019', photo: '/creators/dina.jpg' },
+  { name: 'Dina Aulia Salsabila', nim: '2657201073019', photo: '/creators/dina-portrait.webp' },
   { name: 'Maudi Al Avipah', nim: '2657201073007', photo: '/creators/maudi.jpg' },
   { name: 'Nisrina Sri Wiguna', nim: '2657201073008', photo: '/creators/nisrina.webp' },
 ].map((person, index) => ({ ...person, id: index + 1 }));
