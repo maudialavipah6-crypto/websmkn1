@@ -62,7 +62,7 @@ function RichTextEditor({
   const [assetError, setAssetError] = useState('');
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      StarterKit.configure({ heading: { levels: [2, 3] }, link: false }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -83,7 +83,9 @@ function RichTextEditor({
   }, [disabled]);
 
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) editor.commands.setContent(content || '<p></p>');
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content || '<p></p>', { emitUpdate: false });
+    }
   }, [content, editor]);
 
   async function stageImage(event) {
