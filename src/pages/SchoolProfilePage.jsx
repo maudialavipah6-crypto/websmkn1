@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { ArrowLeft, ArrowUpRight, MapPin, Phone, Mail, School, CalendarDays, Award } from 'lucide-react';
+import { ArrowUpRight, MapPin, Phone, Mail, School, CalendarDays, Award } from 'lucide-react';
+import BackHomeLink from '../components/BackHomeLink';
 import ResponsiveSidebar from '../components/ResponsiveSidebar';
 import { activities, goals, history, missions, rules } from './schoolProfileContent';
 
@@ -65,7 +66,7 @@ export default function SchoolProfilePage() {
   }, []);
 
   return <div className="page-shell"><header className="topbar"><a className="brand-wrap" href="#beranda"><img className="brand-logo" src="/LOGO_SMKN1_GARUT.jpeg" alt=""/><span className="brand-copy"><strong>SMKN 1 Garut</strong><span>Profil Sekolah</span></span></a><a className="header-cta" href="#/login">Login guru / siswa <ArrowUpRight size={16}/></a><ResponsiveSidebar className="site-navigation" label="SMKN 1 Garut"><nav className="nav" aria-label="Navigasi sekolah"><a href="#beranda">Beranda</a><a href="#pembelajaran">Materi TKJ</a><a href="#/dashboard">Dashboard</a></nav></ResponsiveSidebar></header><main className="school-profile-page">
-    <a className="school-profile-back" href="#beranda"><ArrowLeft size={16}/> Kembali ke beranda</a>
+    <BackHomeLink />
     <header className="school-profile-hero">
       <h1>SMK Negeri 1 Garut</h1>
       <p>Sejarah, arah pendidikan, dan kehidupan siswa di SMK Negeri 1 Garut.</p>
@@ -128,5 +129,5 @@ export default function SchoolProfilePage() {
     </section>
     <section className="school-profile-block contact-block" id="kontak-sekolah"><div><h2>Kontak dan lokasi</h2></div><div className="school-contact-list"><p><MapPin/><span>Jl. Cimanuk No. 309A, Pataruman, Tarogong Kidul, Kabupaten Garut, Jawa Barat 44151</span></p><a href="tel:+62262233316"><Phone/><span>(0262) 233316</span><ArrowUpRight/></a><a href="mailto:smkn1garut@ymail.com"><Mail/><span>smkn1garut@ymail.com</span><ArrowUpRight/></a><a href="https://smknegeri1garut.sch.id/" target="_blank" rel="noreferrer"><School/><span>Website resmi sekolah</span><ArrowUpRight/></a></div></section>
     <footer className="school-profile-source">Sumber: <a href="https://referensi.data.kemendikdasmen.go.id/pendidikan/npsn/20209201" target="_blank" rel="noreferrer">Data Pendidikan Kemendikdasmen</a> dan <a href="https://smknegeri1garut.sch.id/" target="_blank" rel="noreferrer">situs resmi SMKN 1 Garut</a>. Informasi akreditasi mengacu pada data tahun 2022.</footer>
-  </main><footer className="school-profile-footer"><a href="#beranda">Kembali ke beranda</a><span>SMKN 1 Garut · Kabupaten Garut</span></footer></div>;
+  </main><footer className="school-profile-footer"><BackHomeLink inverse /><span>SMKN 1 Garut · Kabupaten Garut</span></footer></div>;
 }
